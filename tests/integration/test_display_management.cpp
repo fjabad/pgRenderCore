@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <pgrender/RenderCore.h>
+#include <pgrender/renderCore.h>
 #include <pgrender/renderCoreFactory.h>
 
 class DisplayManagementTest : public ::testing::Test {

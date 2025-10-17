@@ -1,0 +1,25 @@
+# En otro proyecto CMakeLists.txt
+cmake_minimum_required(VERSION 3.25)
+project(MiJuego)
+
+set(CMAKE_CXX_STANDARD 20)
+
+# Opción 1: Usar FetchContent para incluir el proyecto
+include(FetchContent)
+FetchContent_Declare(
+    GraphicsAbstraction
+    GIT_REPOSITORY https://github.com/tu-usuario/GraphicsAbstraction.git
+    GIT_TAG main
+)
+FetchContent_MakeAvailable(GraphicsAbstraction)
+
+# Opción 2: Usar find_package si está instalado
+# find_package(GraphicsAbstraction REQUIRED COMPONENTS SDL3 GLFW)
+
+# Tu ejecutable
+add_executable(mi_juego main.cpp)
+
+# Enlazar con el backend que prefieras
+target_link_libraries(mi_juego PRIVATE GFX::SDL3)
+# O alternativamente:
+# target_link_libraries(mi_juego PRIVATE GFX::GLFW)

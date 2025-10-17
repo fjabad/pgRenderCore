@@ -1,0 +1,22 @@
+# cmake/PGRenderCoreConfig.cmake.in
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# SDL3 y GLFW se instalan junto con PGRenderCore, no necesitamos buscarlos
+# find_dependency solo para dependencias del sistema
+
+# OpenGL (si está disponible)
+find_dependency(OpenGL QUIET)
+
+# Vulkan (opcional)
+find_dependency(Vulkan QUIET)
+
+# Incluir targets exportados
+include("${CMAKE_CURRENT_LIST_DIR}/PGRenderCoreTargets.cmake")
+
+check_required_components(PGRenderCore)
+
+# Proporcionar información sobre componentes disponibles
+set(PGRenderCore_SDL3_FOUND @PGRENDER_BUILD_SDL3_BACKEND@)
+set(PGRenderCore_GLFW_FOUND @PGRENDER_BUILD_GLFW_BACKEND@)

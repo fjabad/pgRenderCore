@@ -16,9 +16,13 @@ int main() {
         config.height = 720;
         config.renderBackend = pgrender::RenderBackend::OpenGL4;
         
+
+        auto &windowManager = context->getWindowManager();
+
         // Crear ventana
-        auto window = context->createWindow(config);
-        
+        auto windowID = windowManager.createWindow(config);
+		auto* window = windowManager.getWindow(windowID);
+
         // Crear contexto gráfico
         auto graphicsContext = window->createContext(pgrender::RenderBackend::OpenGL4);
         graphicsContext->makeCurrent();
@@ -34,10 +38,10 @@ int main() {
 		constexpr  int maxFrames = 3000;
 
         while (!window->shouldClose() && frameCount < maxFrames) {
-            eventSystem.pollEvents();
+            windowManager.pollEvents();
             
             pgrender::Event event;
-            while (eventSystem.getEvent(event)) {
+            while (windowManager.getEventForWindow(windowID, event)) {
                 if (event.type == pgrender::EventType::KeyPress) {
                     std::cout << "Tecla presionada (timestamp: " << event.timestamp << ")\n";
                     
@@ -60,6 +64,7 @@ int main() {
             
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
             frameCount++;
+            windowManager.processWindowClosures();
         }
         
         std::cout << "Aplicación finalizada correctamente\n";

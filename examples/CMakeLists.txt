@@ -23,6 +23,8 @@ function(add_pgrender_example name)
     if(OpenGL_FOUND)
         target_link_libraries(${name} PRIVATE OpenGL::GL)
     endif()
+
+    sign_executable(${name})
 endfunction()
 
 # Ejemplos con SDL3

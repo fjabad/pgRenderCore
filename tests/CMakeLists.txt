@@ -77,6 +77,8 @@ target_include_directories(pgrender_tests
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+sign_executable(pgrender_tests)
+
 # Registrar con CTest (descubrimiento automático de tests)
 include(GoogleTest)
 gtest_discover_tests(pgrender_tests

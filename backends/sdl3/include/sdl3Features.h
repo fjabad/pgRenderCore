@@ -96,15 +96,10 @@ namespace pgrender::backends::sdl3 {
 		SDL3LibraryContext(SDL3LibraryContext&&) = delete;
 		SDL3LibraryContext& operator=(SDL3LibraryContext&&) = delete;
 
-		std::unique_ptr<IWindow> createWindow(const WindowConfig& config) override;
 		std::unique_ptr<IGraphicsContext> createHeadlessContext(const ContextConfig& config) override;
 
-		IEventSystem& getEventSystem() override;
 		IWindowManager& getWindowManager() override;
 		IAdvancedInputSystem& getInputSystem() override;
-
-		// SDL3 specific (para uso interno)
-		SDL3PerWindowEventSystem& getPerWindowEventSystem();
 
 	private:
 		class Impl;

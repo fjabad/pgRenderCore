@@ -14,11 +14,6 @@ namespace pgrender {
 	public:
 		virtual ~ILibraryContext() = default;
 
-		/// Crea una nueva ventana
-		/// @param config Configuración de la ventana
-		/// @return Ventana creada
-		virtual std::unique_ptr<IWindow> createWindow(const WindowConfig& config) = 0;
-
 		/// Crea un contexto gráfico sin ventana (headless)
 		/// @param config Configuración del contexto
 		/// @return Contexto gráfico headless
@@ -30,10 +25,6 @@ namespace pgrender {
 			config.backend = backend;
 			return createHeadlessContext(config);
 		}
-
-		/// Obtiene el sistema de eventos global
-		/// @return Referencia al sistema de eventos
-		virtual IEventSystem& getEventSystem() = 0;
 
 		/// Obtiene el gestor de ventanas
 		/// @return Referencia al gestor de ventanas

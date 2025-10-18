@@ -30,9 +30,6 @@ int main() {
         std::cout << "Ventana creada exitosamente\n";
         std::cout << "Backend: " << (graphicsContext->isShared() ? "Compartido" : "Normal") << "\n";
         
-        // Sistema de eventos
-        auto& eventSystem = context->getEventSystem();
-        
         // Loop principal
         int frameCount = 0;
 		constexpr  int maxFrames = 3000;

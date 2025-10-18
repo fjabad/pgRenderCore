@@ -21,6 +21,7 @@ namespace pgrender::backends::sdl3 {
 			WindowEventCallback eventCallback;
 		};
 
+		SDL3PerWindowEventSystem eventSystem;
 		ILibraryContext& context;
 		std::unordered_map<WindowID, WindowData> windows;
 		mutable std::mutex mutex;
@@ -54,8 +55,7 @@ namespace pgrender::backends::sdl3 {
 
 		m_impl->windows[windowId] = std::move(data);
 
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		eventSystem.registerWindow(windowId, sdlWindow);
+		m_impl->eventSystem.registerWindow(windowId, sdlWindow);
 
 		return windowId;
 	}
@@ -65,8 +65,7 @@ namespace pgrender::backends::sdl3 {
 
 		auto it = m_impl->windows.find(id);
 		if (it != m_impl->windows.end()) {
-			auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-			eventSystem.unregisterWindow(id);
+			m_impl->eventSystem.unregisterWindow(id);
 
 			it->second.context.reset();
 			it->second.window.reset();
@@ -77,11 +76,8 @@ namespace pgrender::backends::sdl3 {
 
 	void SDL3WindowManager::closeAllWindows() {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-
 		for (auto& [id, data] : m_impl->windows) {
-			eventSystem.unregisterWindow(id);
+			m_impl->eventSystem.unregisterWindow(id);
 			data.context.reset();
 			data.window.reset();
 		}
@@ -328,13 +324,11 @@ namespace pgrender::backends::sdl3 {
 
 	// Eventos
 	void SDL3WindowManager::pollEvents() {
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		eventSystem.pollEvents();
+		m_impl->eventSystem.pollEvents();
 	}
 
 	bool SDL3WindowManager::getEventForWindow(WindowID windowId, Event& event) {
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		return eventSystem.getEventForWindow(windowId, event);
+		return m_impl->eventSystem.getEventForWindow(windowId, event);
 	}
 
 	void SDL3WindowManager::processWindowClosures() {
@@ -363,23 +357,19 @@ namespace pgrender::backends::sdl3 {
 	}
 
 	void SDL3WindowManager::setWindowEventFilter(WindowID id, EventFilter filter) {
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		eventSystem.setWindowEventFilter(id, filter);
+		m_impl->eventSystem.setWindowEventFilter(id, filter);
 	}
 
 	void SDL3WindowManager::setWindowEventWatcher(WindowID id, EventFilter watcher) {
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		eventSystem.setWindowEventWatcher(id, watcher);
+		m_impl->eventSystem.setWindowEventWatcher(id, watcher);
 	}
 
 	size_t SDL3WindowManager::getWindowQueueSize(WindowID id) const {
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		return eventSystem.getWindowQueueSize(id);
+		return m_impl->eventSystem.getWindowQueueSize(id);
 	}
 
 	size_t SDL3WindowManager::getTotalQueuedEvents() const {
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		return eventSystem.getTotalQueuedEvents();
+		return m_impl->eventSystem.getTotalQueuedEvents();
 	}
 
 	// ============================================================================
@@ -388,7 +378,7 @@ namespace pgrender::backends::sdl3 {
 
 	class SDL3LibraryContext::Impl {
 	public:
-		SDL3PerWindowEventSystem eventSystem;
+	
 		SDL3WindowManager windowManager;
 		SDL3AdvancedInputSystem inputSystem;
 
@@ -410,16 +400,8 @@ namespace pgrender::backends::sdl3 {
 
 	SDL3LibraryContext::~SDL3LibraryContext() = default;
 
-	std::unique_ptr<IWindow> SDL3LibraryContext::createWindow(const WindowConfig& config) {
-		return std::make_unique<SDL3Window>(config);
-	}
-
 	std::unique_ptr<IGraphicsContext> SDL3LibraryContext::createHeadlessContext(const ContextConfig& config) {
 		return std::make_unique<SDL3GraphicsContext>(config);
-	}
-
-	IEventSystem& SDL3LibraryContext::getEventSystem() {
-		return m_impl->eventSystem;
 	}
 
 	IWindowManager& SDL3LibraryContext::getWindowManager() {
@@ -430,14 +412,9 @@ namespace pgrender::backends::sdl3 {
 		return m_impl->inputSystem;
 	}
 
-	SDL3PerWindowEventSystem& SDL3LibraryContext::getPerWindowEventSystem() {
-		return m_impl->eventSystem;
-	}
-
-
 	// ============================================================================
-// SDL3Gamepad::Impl
-// ============================================================================
+	// SDL3Gamepad::Impl
+	// ============================================================================
 
 	class SDL3Gamepad::Impl {
 	public:
@@ -720,378 +697,3 @@ namespace pgrender::backends::sdl3 {
 
 
 } // namespace pgrender::backends::sdl3
-
-
-
-
-#if 0
-
-namespace pgrender::backends::sdl3 {
-
-	// ============================================================================
-	// SDL3WindowManager::Impl
-	// ============================================================================
-
-
-	class SDL3WindowManager::Impl {
-	public:
-		struct WindowData {
-			std::unique_ptr<IWindow> window;
-			std::unique_ptr<IGraphicsContext> context;
-			WindowEventCallback eventCallback;
-		};
-
-		ILibraryContext& context;
-		std::unordered_map<WindowID, WindowData> windows;
-		mutable std::mutex mutex;
-
-		explicit Impl(ILibraryContext& ctx) : context(ctx) {}
-	};
-
-	SDL3WindowManager::SDL3WindowManager(ILibraryContext& context)
-		: m_impl(std::make_unique<Impl>(context)) {
-	}
-
-	SDL3WindowManager::~SDL3WindowManager() = default;
-
-	WindowID SDL3WindowManager::createWindow(const WindowConfig& config) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		auto window = std::make_unique<SDL3Window>(config);
-		auto* sdlWindow = static_cast<SDL3Window*>(window.get());
-		WindowID windowId = sdlWindow->getWindowID();
-
-		Impl::WindowData data;
-		data.window = std::move(window);
-
-		m_impl->windows[windowId] = std::move(data);
-
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		eventSystem.registerWindow(windowId, sdlWindow);
-
-		return windowId;
-	}
-
-	void SDL3WindowManager::destroyWindow(WindowID id) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		auto it = m_impl->windows.find(id);
-		if (it != m_impl->windows.end()) {
-			auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-			eventSystem.unregisterWindow(id);
-
-			it->second.context.reset();
-			it->second.window.reset();
-
-			m_impl->windows.erase(it);
-		}
-	}
-
-	void SDL3WindowManager::closeAllWindows() {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-
-		for (auto& [id, data] : m_impl->windows) {
-			eventSystem.unregisterWindow(id);
-			data.context.reset();
-			data.window.reset();
-		}
-
-		m_impl->windows.clear();
-	}
-
-	IWindow* SDL3WindowManager::getWindow(WindowID id) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		return (it != m_impl->windows.end()) ? it->second.window.get() : nullptr;
-	}
-
-	const IWindow* SDL3WindowManager::getWindow(WindowID id) const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		return (it != m_impl->windows.end()) ? it->second.window.get() : nullptr;
-	}
-
-	std::vector<WindowID> SDL3WindowManager::getActiveWindows() const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		std::vector<WindowID> ids;
-		ids.reserve(m_impl->windows.size());
-		for (const auto& [id, _] : m_impl->windows) {
-			ids.push_back(id);
-		}
-		return ids;
-	}
-
-	size_t SDL3WindowManager::getWindowCount() const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		return m_impl->windows.size();
-	}
-
-	bool SDL3WindowManager::hasOpenWindows() const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		return !m_impl->windows.empty();
-	}
-
-	IGraphicsContext* SDL3WindowManager::getWindowContext(WindowID id) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		return (it != m_impl->windows.end()) ? it->second.context.get() : nullptr;
-	}
-
-	void SDL3WindowManager::setWindowContext(WindowID id, std::unique_ptr<IGraphicsContext> context) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		if (it != m_impl->windows.end()) {
-			it->second.context = std::move(context);
-		}
-	}
-
-	int SDL3WindowManager::getDisplayCount() const {
-		int count = 0;
-		SDL_DisplayID* displays = SDL_GetDisplays(&count);
-		SDL_free(displays);
-		return count;
-	}
-
-	void SDL3WindowManager::setWindowHandle(WindowID id, IWindow* window) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		m_impl->windows[id] = window;
-	}
-
-
-	// ============================================================================
-	// SDL3MultiWindowManager::Impl
-	// ============================================================================
-
-	class SDL3MultiWindowManager::Impl {
-	public:
-		struct WindowData {
-			std::unique_ptr<IWindow> window;
-			std::unique_ptr<IGraphicsContext> context;
-			WindowEventCallback eventCallback;
-		};
-
-		ILibraryContext& context;
-		std::unordered_map<WindowID, WindowData> windows;
-		mutable std::mutex mutex;
-
-		explicit Impl(ILibraryContext& ctx) : context(ctx) {}
-	};
-
-	SDL3MultiWindowManager::SDL3MultiWindowManager(ILibraryContext& context)
-		: m_impl(std::make_unique<Impl>(context)) {
-	}
-
-	SDL3MultiWindowManager::~SDL3MultiWindowManager() = default;
-
-	WindowID SDL3MultiWindowManager::createWindow(const WindowConfig& config) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		auto window = std::make_unique<SDL3Window>(config);
-		auto* sdlWindow = static_cast<SDL3Window*>(window.get());
-		WindowID windowId = sdlWindow->getWindowID();
-
-		Impl::WindowData data;
-		data.window = std::move(window);
-
-		m_impl->windows[windowId] = std::move(data);
-
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		eventSystem.registerWindow(windowId, sdlWindow);
-		eventSystem.createWindowQueue(windowId);
-
-		return windowId;
-	}
-
-	void SDL3MultiWindowManager::destroyWindow(WindowID id) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		auto it = m_impl->windows.find(id);
-		if (it != m_impl->windows.end()) {
-			auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-			eventSystem.unregisterWindow(id);
-			eventSystem.destroyWindowQueue(id);
-
-			it->second.context.reset();
-			it->second.window.reset();
-
-			m_impl->windows.erase(it);
-		}
-	}
-
-	IWindow* SDL3MultiWindowManager::getWindow(WindowID id) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		return (it != m_impl->windows.end()) ? it->second.window.get() : nullptr;
-	}
-
-	const IWindow* SDL3MultiWindowManager::getWindow(WindowID id) const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		return (it != m_impl->windows.end()) ? it->second.window.get() : nullptr;
-	}
-
-	std::vector<WindowID> SDL3MultiWindowManager::getActiveWindows() const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		std::vector<WindowID> ids;
-		ids.reserve(m_impl->windows.size());
-		for (const auto& [id, _] : m_impl->windows) {
-			ids.push_back(id);
-		}
-		return ids;
-	}
-
-	size_t SDL3MultiWindowManager::getWindowCount() const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		return m_impl->windows.size();
-	}
-
-	bool SDL3MultiWindowManager::hasOpenWindows() const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		return !m_impl->windows.empty();
-	}
-
-	void SDL3MultiWindowManager::closeAllWindows() {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-
-		for (auto& [id, data] : m_impl->windows) {
-			eventSystem.unregisterWindow(id);
-			eventSystem.destroyWindowQueue(id);
-			data.context.reset();
-			data.window.reset();
-		}
-
-		m_impl->windows.clear();
-	}
-
-	void SDL3MultiWindowManager::setWindowEventCallback(WindowID id, WindowEventCallback callback) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		if (it != m_impl->windows.end()) {
-			it->second.eventCallback = callback;
-		}
-	}
-
-	IGraphicsContext* SDL3MultiWindowManager::getWindowContext(WindowID id) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		return (it != m_impl->windows.end()) ? it->second.context.get() : nullptr;
-	}
-
-	void SDL3MultiWindowManager::setWindowContext(WindowID id, std::unique_ptr<IGraphicsContext> context) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		if (it != m_impl->windows.end()) {
-			it->second.context = std::move(context);
-		}
-	}
-
-	WindowEventQueue* SDL3MultiWindowManager::getWindowEventQueue(WindowID id) {
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		return eventSystem.getWindowQueue(id);
-	}
-
-	void SDL3MultiWindowManager::setWindowEventFilter(WindowID id, EventFilter filter) {
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		eventSystem.setWindowEventFilter(id, filter);
-	}
-
-	void SDL3MultiWindowManager::setWindowEventWatcher(WindowID id, EventFilter watcher) {
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		eventSystem.setWindowEventWatcher(id, watcher);
-	}
-
-	bool SDL3MultiWindowManager::getEventForWindow(WindowID id, Event& event) {
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		return eventSystem.getEventForWindow(id, event);
-	}
-
-	void SDL3MultiWindowManager::pollEvents() {
-		auto& eventSystem = static_cast<SDL3LibraryContext&>(m_impl->context).getPerWindowEventSystem();
-		eventSystem.pollEvents();
-	}
-
-	void SDL3MultiWindowManager::closeMarkedWindows() {
-		std::vector<WindowID> toClose;
-
-		{
-			std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-			// Recolectar IDs de ventanas que deben cerrarse
-			for (const auto& [id, data] : m_impl->windows) {
-				if (data.window && data.window->shouldClose()) {
-					toClose.push_back(id);
-				}
-			}
-		}
-
-		// Cerrar ventanas fuera del lock para evitar deadlocks
-		for (WindowID id : toClose) {
-			destroyWindow(id);
-		}
-	}
-
-
-	// ============================================================================
-	// SDL3LibraryContext::Impl
-	// ============================================================================
-
-	class SDL3LibraryContext::Impl {
-	public:
-		SDL3PerWindowEventSystem eventSystem;
-		SDL3WindowManager windowManager;
-		SDL3AdvancedInputSystem inputSystem;
-
-		Impl() {
-			if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD)) {
-				throw std::runtime_error(std::string("Failed to initialize SDL3: ") + SDL_GetError());
-			}
-		}
-
-		~Impl() {
-			SDL_Quit();
-		}
-	};
-
-	SDL3LibraryContext::SDL3LibraryContext()
-		: m_impl(std::make_unique<Impl>()) {
-	}
-
-	SDL3LibraryContext::~SDL3LibraryContext() = default;
-
-	std::unique_ptr<IWindow> SDL3LibraryContext::createWindow(const WindowConfig& config) {
-		auto window = std::make_unique<SDL3Window>(config);
-		auto* sdlWindow = static_cast<SDL3Window*>(window.get());
-
-		m_impl->eventSystem.registerWindow(sdlWindow->getWindowID(), sdlWindow);
-		m_impl->windowManager.setWindowHandle(sdlWindow->getWindowID(), window.get());
-
-		return window;
-	}
-
-	std::unique_ptr<IGraphicsContext> SDL3LibraryContext::createHeadlessContext(const ContextConfig& config) {
-		return std::make_unique<SDL3GraphicsContext>(config);
-	}
-
-	IEventSystem& SDL3LibraryContext::getEventSystem() {
-		return m_impl->eventSystem;
-	}
-
-	SDL3PerWindowEventSystem& SDL3LibraryContext::getPerWindowEventSystem() {
-		return m_impl->eventSystem;
-	}
-
-	SDL3WindowManager& SDL3LibraryContext::getWindowManager() {
-		return m_impl->windowManager;
-	}
-
-	SDL3AdvancedInputSystem& SDL3LibraryContext::getInputSystem() {
-		return m_impl->inputSystem;
-	}
-
-} // namespace pgrender::backends::sdl3
-
-#endif

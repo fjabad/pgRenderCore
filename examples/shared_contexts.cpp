@@ -1,5 +1,5 @@
-#include <pgrender/RenderCore.hpp>
-#include <pgrender/RenderCoreFactory.hpp>
+#include <pgrender/renderCore.h>
+#include <pgrender/renderCoreFactory.h>
 #include <iostream>
 #include <thread>
 #include <atomic>
@@ -31,7 +31,10 @@ int main() {
         mainConfig.height = 720;
         mainConfig.renderBackend = pgrender::RenderBackend::OpenGL4;
         
-        auto mainWindow = context->createWindow(mainConfig);
+        auto& windowManager = context->getWindowManager();
+        auto mainWindowID = windowManager.createWindow(mainConfig);
+
+		auto* mainWindow = windowManager.getWindow(mainWindowID);
         
         // Contexto principal
         pgrender::ContextConfig mainCtxConfig;
@@ -58,14 +61,13 @@ int main() {
         std::thread worker(uploadThread, uploadContext.get(), std::ref(running));
         
         // Loop principal
-        auto& events = context->getEventSystem();
         int frameCount = 0;
         
         while (!mainWindow->shouldClose() && frameCount < 300) {
-            events.pollEvents();
+            windowManager.pollEvents();
             
             pgrender::Event event;
-            while (events.getEvent(event)) {
+            while (windowManager.getEventForWindow(mainWindowID, event)) {
                 if (event.type == pgrender::EventType::KeyPress) {
                     if (event.key.key == pgrender::KeyCode::Escape) {
                         frameCount = 1000;
@@ -79,6 +81,7 @@ int main() {
             
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
             frameCount++;
+			windowManager.processWindowClosures();
         }
         
         // Detener thread

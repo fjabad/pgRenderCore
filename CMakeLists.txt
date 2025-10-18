@@ -35,6 +35,16 @@ include(GNUInstallDirs)
 # Librería core (headers only interface)
 add_subdirectory(core)
 
+# Función para firmar un ejecutable en macOS
+function(sign_executable target_name)
+    if(APPLE)
+        add_custom_command(TARGET ${target_name} POST_BUILD
+            COMMAND /usr/bin/codesign --force --deep --sign - $<TARGET_FILE:${target_name}>
+            COMMENT "Signing ${target_name} for macOS"
+        )
+    endif()
+endfunction()
+
 # Backends
 if(PGRENDER_BUILD_SDL3_BACKEND)
     add_subdirectory(backends/sdl3)

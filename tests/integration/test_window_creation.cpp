@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <pgrender/renderCore.h>
 #include <pgrender/renderCoreFactory.h>
+#include <thread>
 
 class WindowCreationTest : public ::testing::Test {
 protected:

@@ -4,13 +4,13 @@
 
 int main() {
 	try {
-		// Crear contexto (incluye window manager automáticamente)
+		// Crear contexto (incluye window manager automÃ¡ticamente)
 		auto context = pgrender::RenderCoreFactory::createContext();
 		auto& windowMgr = context->getWindowManager();
 
 		// Crear ventanas
 		pgrender::WindowConfig config;
-		config.title = "Mi Aplicación";
+		config.title = "Mi AplicaciÃ³n";
 		config.width = 1280;
 		config.height = 720;
 

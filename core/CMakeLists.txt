@@ -4,12 +4,31 @@ file(GLOB_RECURSE CORE_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
 )
 
-# Crear la librería INTERFACE
-add_library(pgrender_core INTERFACE)
+
+file(GLOB_RECURSE CORE_SOURCES
+    CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+)
+
+
+# Crear la librería 
+add_library(pgrender_core ${CORE_HEADERS} ${CORE_SOURCES})
 add_library(PGRenderCore::Core ALIAS pgrender_core)
 
+# Configurar propiedades
+set_target_properties(pgrender_core PROPERTIES
+    OUTPUT_NAME "pgrender-core"
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+    CXX_STANDARD 20
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS OFF
+	FOLDER PGRenderCore/Core
+)
+
+
 target_include_directories(pgrender_core
-    INTERFACE
+    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
@@ -26,34 +45,10 @@ target_compile_options(pgrender_core
         $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic>
 )
 
-# SOLUCIÓN: Crear un target "dummy" para que aparezca en Visual Studio
-if(MSVC OR CMAKE_GENERATOR MATCHES "Visual Studio")
-    # Crear un custom target que depende de los headers
-    add_custom_target(pgrender_core_ide
-        SOURCES ${CORE_HEADERS}
-    )
-    
-    # Organizar en carpetas de Visual Studio
-    source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include"
-        PREFIX "Header Files"
-        FILES ${CORE_HEADERS}
-    )
-    
-    # Establecer como proyecto de inicio (opcional)
-    set_property(DIRECTORY ${CMAKE_SOURCE_DIR} 
-        PROPERTY VS_STARTUP_PROJECT pgrender_core_ide
-    )
-    
-    # Colocar en una carpeta específica en la solución
-    set_target_properties(pgrender_core_ide PROPERTIES
-        FOLDER "PGRenderCore/Core"
-    )
-endif()
-
 # Instalar headers
 install(DIRECTORY include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    FILES_MATCHING PATTERN "*.hpp"
+    FILES_MATCHING PATTERN "*.h"
 )
 
 # Instalar target

@@ -17,8 +17,10 @@ public:
     virtual void setTitle(const std::string& title) = 0;
     virtual void setSize(uint32_t width, uint32_t height) = 0;
     virtual void getSize(uint32_t& width, uint32_t& height) const = 0;
-    virtual bool shouldClose() const = 0;
+    bool shouldClose() const { return m_shouldClose; }
+	void markForClose() { m_shouldClose = true; }
     virtual void* getNativeHandle() const = 0;
+	virtual WindowID getWindowID() const = 0;
     
     // Crear contexto gráfico
     virtual std::unique_ptr<IGraphicsContext> createContext(const ContextConfig& config) = 0;
@@ -47,6 +49,7 @@ public:
 
 protected:
     IWindow() = default;
+	bool m_shouldClose = false;
 };
 
 } // namespace pgrender

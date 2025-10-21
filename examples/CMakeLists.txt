@@ -8,17 +8,19 @@ function(add_pgrender_example name)
         CXX_STANDARD 20
         CXX_STANDARD_REQUIRED ON
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/examples"
+        FOLDER "PGRenderCore/Examples"
     )
     
-    # Enlazar con el backend apropiado
+	 # Enlazar con el backend apropiado
     if(EXAMPLE_BACKEND STREQUAL "SDL3")
         target_link_libraries(${name} PRIVATE PGRenderCore::SDL3)
     elseif(EXAMPLE_BACKEND STREQUAL "GLFW")
         target_link_libraries(${name} PRIVATE PGRenderCore::GLFW)
-    elseif(EXAMPLE_BACKEND STREQUAL "BOTH")
-        target_link_libraries(${name} PRIVATE PGRenderCore::SDL3 PGRenderCore::GLFW)
     endif()
+
+	target_link_libraries(${name} PRIVATE PGRenderCore::Factory)
     
+
     # OpenGL si está disponible
     if(OpenGL_FOUND)
         target_link_libraries(${name} PRIVATE OpenGL::GL)
@@ -27,56 +29,28 @@ function(add_pgrender_example name)
     sign_executable(${name})
 endfunction()
 
-# Ejemplos con SDL3
-if(PGRENDER_BUILD_SDL3_BACKEND)
-    add_pgrender_example(example_basic_window_sdl3
-        BACKEND SDL3
-        SOURCES basic_window.cpp
-    )
-    
-    add_pgrender_example(example_shared_contexts_sdl3
-        BACKEND SDL3
-        SOURCES shared_contexts.cpp
-    )
-    
-    add_pgrender_example(example_multi_window_sdl3
-        BACKEND SDL3
-        SOURCES multi_window.cpp
-    )
-    
-    add_pgrender_example(example_per_window_events_sdl3
-        BACKEND SDL3
-        SOURCES per_window_events.cpp
-    )    
-	
-    add_pgrender_example(example_simple
-        BACKEND SDL3
-        SOURCES simple.cpp
-    )
-endif()
 
-# Ejemplos con GLFW
-if(PGRENDER_BUILD_GLFW_BACKEND)
-    add_pgrender_example(example_basic_window_glfw
-        BACKEND GLFW
-        SOURCES basic_window.cpp
-    )
-    
-    add_pgrender_example(example_shared_contexts_glfw
-        BACKEND GLFW
-        SOURCES shared_contexts.cpp
-    )
-endif()
+file(GLOB example_files "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
-# Ejemplo que usa ambos backends (factory)
-if(PGRENDER_BUILD_SDL3_BACKEND AND PGRENDER_BUILD_GLFW_BACKEND)
-    add_pgrender_example(example_backend_selection
-        BACKEND BOTH
-        SOURCES backend_selection.cpp
-    )
-endif()
 
-add_pgrender_example(example_show_window_opts
-	BACKEND SDL3
-	SOURCES show_window_opts.cpp
-)
+message (STATUS "Creando los ejemplos...")
+foreach(example IN LISTS example_files)
+	get_filename_component(base_name "${example}" NAME_WE)
+	message(STATUS "Procesando archivo de ejemplo: ${base_name}")
+
+	if(PGRENDER_BUILD_SDL3_BACKEND)
+	 message(STATUS "Procesando : ${base_name}_sdl3")
+	    add_pgrender_example("${base_name}_sdl3"
+	        BACKEND SDL3
+			SOURCES ${example}
+		)
+	endif()
+	if(PGRENDER_BUILD_GLFW_BACKEND)
+	 message(STATUS "Procesando : ${base_name}_glfw")
+		add_pgrender_example("${base_name}_glfw"
+			BACKEND GLFW
+			SOURCES ${example}
+		)
+	endif()
+
+endforeach()

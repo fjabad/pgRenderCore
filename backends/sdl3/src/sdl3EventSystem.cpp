@@ -1,95 +1,20 @@
 #include "sdl3EventSystem.h"
-#include "sdl3Window.h"
 #include <SDL3/SDL.h>
-#include <unordered_map>
-#include <mutex>
 
 namespace pgrender::backends::sdl3 {
 
-	class SDL3PerWindowEventSystem::Impl {
-	public:
-		std::unordered_map<WindowID, std::unique_ptr<WindowEventQueue>> windowQueues;
-		std::unordered_map<WindowID, SDL3Window*> windows;
-		std::function<void(const Event&)> globalCallback;
-		mutable std::mutex mutex;
-		mutable std::mutex callbackMutex;
-
-		// Versiones internas sin lock (asumen que el mutex ya está bloqueado)
-		void createWindowQueueInternal(WindowID windowId);
-		void destroyWindowQueueInternal(WindowID windowId);
-
-		void distributeEvent(const Event& event, WindowID targetWindow);
-		WindowID getWindowIdFromMouse(const SDL_Event& sdlEvent);
-		void handleWindowClose(const SDL_Event& sdlEvent, WindowID windowId);
-
-		Event translateEvent(const SDL_Event& sdlEvent);
-		KeyCode translateKeyCode(SDL_Keycode key);
-		MouseButton translateMouseButton(uint8_t button);
-	};
-
-	SDL3PerWindowEventSystem::SDL3PerWindowEventSystem()
-		: m_impl(std::make_unique<Impl>()) {
-	}
+	static Event translateEvent(const SDL_Event& sdlEvent);
+	static WindowID getWindowIdFromMouse(const SDL_Event& sdlEvent);
+	static KeyCode translateKeyCode(SDL_Keycode key);
+	static MouseButton translateMouseButton(uint8_t button);
 
 	SDL3PerWindowEventSystem::~SDL3PerWindowEventSystem() = default;
-
-
-	// Versión pública con lock
-	void SDL3PerWindowEventSystem::createWindowQueue(WindowID windowId) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		m_impl->createWindowQueueInternal(windowId);
-	}
-
-	// Versión interna sin lock
-	void SDL3PerWindowEventSystem::Impl::createWindowQueueInternal(WindowID windowId) {
-		// NO bloquear aquí - asume que el mutex ya está bloqueado
-		if (windowQueues.find(windowId) == windowQueues.end()) {
-			windowQueues[windowId] = std::make_unique<WindowEventQueue>();
-		}
-	}
-
-
-	// Versión pública con lock
-	void SDL3PerWindowEventSystem::destroyWindowQueue(WindowID windowId) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		m_impl->destroyWindowQueueInternal(windowId);
-	}
-
-	// Versión interna sin lock
-	void SDL3PerWindowEventSystem::Impl::destroyWindowQueueInternal(WindowID windowId) {
-		// NO bloquear aquí
-		windowQueues.erase(windowId);
-		windows.erase(windowId);
-	}
-
-	WindowEventQueue* SDL3PerWindowEventSystem::getWindowQueue(WindowID windowId) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		auto it = m_impl->windowQueues.find(windowId);
-		return (it != m_impl->windowQueues.end()) ? it->second.get() : nullptr;
-	}
-
-	void SDL3PerWindowEventSystem::registerWindow(WindowID windowId, SDL3Window* window) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		// Usar versión interna sin lock
-		m_impl->windows[windowId] = window;
-		m_impl->createWindowQueueInternal(windowId);  // SIN deadlock
-	}
-
-	void SDL3PerWindowEventSystem::unregisterWindow(WindowID windowId) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		// Usar versión interna sin lock
-		m_impl->destroyWindowQueueInternal(windowId);  // SIN deadlock
-	}
-
 
 	void SDL3PerWindowEventSystem::pollEvents() {
 		SDL_Event sdlEvent;
 
 		while (SDL_PollEvent(&sdlEvent)) {
-			Event event = m_impl->translateEvent(sdlEvent);
+			Event event = translateEvent(sdlEvent);
 			WindowID targetWindow = 0;
 
 			if (sdlEvent.type >= SDL_EVENT_WINDOW_FIRST &&
@@ -102,109 +27,18 @@ namespace pgrender::backends::sdl3 {
 			}
 			else if (sdlEvent.type >= SDL_EVENT_MOUSE_MOTION &&
 				sdlEvent.type <= SDL_EVENT_MOUSE_WHEEL) {
-				targetWindow = m_impl->getWindowIdFromMouse(sdlEvent);
+				targetWindow = getWindowIdFromMouse(sdlEvent);
 			}
 			else if (sdlEvent.type == SDL_EVENT_QUIT) {
 				targetWindow = 0;
 			}
 
-			m_impl->distributeEvent(event, targetWindow);
-
-			// Callback global (lock separado)
-			{
-				std::lock_guard<std::mutex> lock(m_impl->callbackMutex);
-				if (m_impl->globalCallback) {
-					m_impl->globalCallback(event);
-				}
-			}
-
-			m_impl->handleWindowClose(sdlEvent, targetWindow);
+			distributeEvent(event, targetWindow);
 		}
 	}
 
-	bool SDL3PerWindowEventSystem::getEvent(Event& event) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		for (auto& [windowId, queue] : m_impl->windowQueues) {
-			auto maybeEvent = queue->tryPopEvent();
-			if (maybeEvent) {
-				event = *maybeEvent;
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	bool SDL3PerWindowEventSystem::getEventForWindow(WindowID windowId, Event& event) {
-		auto* queue = getWindowQueue(windowId);
-		if (!queue) {
-			return false;
-		}
-
-		auto maybeEvent = queue->tryPopEvent();
-		if (maybeEvent) {
-			event = *maybeEvent;
-			return true;
-		}
-
-		return false;
-	}
-
-	void SDL3PerWindowEventSystem::setEventCallback(std::function<void(const Event&)> callback) {
-		std::lock_guard<std::mutex> lock(m_impl->callbackMutex);
-		m_impl->globalCallback = callback;
-	}
-
-	void SDL3PerWindowEventSystem::setWindowEventFilter(WindowID windowId, EventFilter filter) {
-		auto* queue = getWindowQueue(windowId);
-		if (queue) {
-			queue->setEventFilter(filter);
-		}
-	}
-
-	void SDL3PerWindowEventSystem::setWindowEventWatcher(WindowID windowId, EventFilter watcher) {
-		auto* queue = getWindowQueue(windowId);
-		if (queue) {
-			queue->setEventWatcher(watcher);
-		}
-	}
-
-	size_t SDL3PerWindowEventSystem::getWindowQueueSize(WindowID windowId) const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		auto it = m_impl->windowQueues.find(windowId);
-		return (it != m_impl->windowQueues.end()) ? it->second->size() : 0;
-	}
-
-	size_t SDL3PerWindowEventSystem::getTotalQueuedEvents() const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		size_t total = 0;
-		for (const auto& [_, queue] : m_impl->windowQueues) {
-			total += queue->size();
-		}
-		return total;
-	}
-
-	// Implementaciones privadas de Impl
-	void SDL3PerWindowEventSystem::Impl::distributeEvent(const Event& event, WindowID targetWindow) {
-		std::lock_guard<std::mutex> lock(mutex);
-
-		if (targetWindow == 0) {
-			for (auto& [windowId, queue] : windowQueues) {
-				queue->pushEvent(event);
-			}
-		}
-		else {
-			auto it = windowQueues.find(targetWindow);
-			if (it != windowQueues.end()) {
-				it->second->pushEvent(event);
-			}
-		}
-	}
-
-	WindowID SDL3PerWindowEventSystem::Impl::getWindowIdFromMouse(const SDL_Event& sdlEvent) {
+	WindowID getWindowIdFromMouse(const SDL_Event& sdlEvent) {
 		switch (sdlEvent.type) {
 		case SDL_EVENT_MOUSE_MOTION:
 			return sdlEvent.motion.windowID;
@@ -218,28 +52,14 @@ namespace pgrender::backends::sdl3 {
 		}
 	}
 
-	void SDL3PerWindowEventSystem::Impl::handleWindowClose(const SDL_Event& sdlEvent, WindowID windowId) {
-		if (sdlEvent.type == SDL_EVENT_QUIT) {
-			for (auto& [id, window] : windows) {
-				if (window) {
-					window->markForClose();
-				}
-			}
-		}
-		else if (sdlEvent.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED) {
-			auto it = windows.find(windowId);
-			if (it != windows.end() && it->second) {
-				it->second->markForClose();
-			}
-		}
-	}
 
-	Event SDL3PerWindowEventSystem::Impl::translateEvent(const SDL_Event& sdlEvent) {
+	Event translateEvent(const SDL_Event& sdlEvent) {
 		Event event{};
 		event.timestamp = sdlEvent.common.timestamp;
 
 		switch (sdlEvent.type) {
 		case SDL_EVENT_QUIT:
+		case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
 			event.type = EventType::WindowClose;
 			break;
 
@@ -331,7 +151,7 @@ namespace pgrender::backends::sdl3 {
 		return event;
 	}
 
-	KeyCode SDL3PerWindowEventSystem::Impl::translateKeyCode(SDL_Keycode key) {
+	KeyCode translateKeyCode(SDL_Keycode key) {
 		switch (key) {
 		case SDLK_A: return KeyCode::A;
 		case SDLK_B: return KeyCode::B;
@@ -394,7 +214,7 @@ namespace pgrender::backends::sdl3 {
 		}
 	}
 
-	MouseButton SDL3PerWindowEventSystem::Impl::translateMouseButton(uint8_t button) {
+	MouseButton translateMouseButton(uint8_t button) {
 		switch (button) {
 		case SDL_BUTTON_LEFT: return MouseButton::Left;
 		case SDL_BUTTON_RIGHT: return MouseButton::Right;

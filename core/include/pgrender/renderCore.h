@@ -32,7 +32,7 @@ namespace pgrender {
 
 		/// Obtiene el sistema de entrada avanzado
 		/// @return Referencia al sistema de entrada
-		virtual IAdvancedInputSystem& getInputSystem() = 0;
+		virtual IInputSystem& getInputSystem() = 0;
 
 		ILibraryContext(const ILibraryContext&) = delete;
 		ILibraryContext& operator=(const ILibraryContext&) = delete;

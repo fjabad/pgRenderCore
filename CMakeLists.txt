@@ -32,7 +32,7 @@ include(Dependencies)
 # Configuración de instalación
 include(GNUInstallDirs)
 
-# Librería core (headers only interface)
+# Librería core 
 add_subdirectory(core)
 
 # Función para firmar un ejecutable en macOS
@@ -53,6 +53,8 @@ endif()
 if(PGRENDER_BUILD_GLFW_BACKEND)
     add_subdirectory(backends/glfw)
 endif()
+
+add_subdirectory(factory)
 
 # Ejemplos
 if(PGRENDER_BUILD_EXAMPLES)

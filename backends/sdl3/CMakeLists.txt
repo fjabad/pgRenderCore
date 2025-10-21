@@ -32,6 +32,7 @@ set_target_properties(pgrender_sdl3 PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS OFF
+	FOLDER PGRenderCore/Backends
 )
 
 # Filtrar directorios que no existen

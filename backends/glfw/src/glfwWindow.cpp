@@ -1,76 +1,107 @@
-#include "pgrender/backends/glfw/GLFWWindow.hpp"
+#include "glfwWindow.h"
 #include <stdexcept>
+#include <GLFW/glfw3.h>
+#include <glfwContext.h>
 
 namespace pgrender::backends::glfw {
 
-static void window_close_callback(GLFWwindow* window) {
-    auto* instance = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
-    if (instance) instance->markForClose();
-}
 
-GLFWWindow::GLFWWindow(const WindowConfig& config) : m_config(config) {
-    if (!glfwInit()) {
-        throw std::runtime_error("Failed to initialize GLFW");
-    }
+	static void window_close_callback(GLFWwindow* window) {
+		auto* instance = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+		if (instance) instance->markForClose();
+	}
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, config.resizable ? GLFW_TRUE : GLFW_FALSE);
+	class GLFWWindow::Impl {
+	public:
+		GLFWwindow* window = nullptr;
+		WindowConfig m_config;
+		bool m_shouldClose = false;
 
-    m_window = glfwCreateWindow(config.width, config.height, config.title.c_str(), nullptr, nullptr);
-    if (!m_window) {
-        glfwTerminate();
-        throw std::runtime_error("Failed to create GLFW window");
-    }
+		explicit Impl(const WindowConfig& config) : m_config(config) {
+			//if (!glfwInit()) {
+			//	throw std::runtime_error("Failed to initialize GLFW");
+			//}
 
-    glfwSetWindowUserPointer(m_window, this);
-    glfwSetWindowCloseCallback(m_window, window_close_callback);
-}
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+			glfwWindowHint(GLFW_RESIZABLE, config.resizable ? GLFW_TRUE : GLFW_FALSE);
 
-GLFWWindow::~GLFWWindow() {
-    if (m_window) {
-        glfwDestroyWindow(m_window);
-    }
-}
+			window = glfwCreateWindow(config.width, config.height, config.title.c_str(), nullptr, nullptr);
+			if (!window) {
+				throw std::runtime_error("Failed to create GLFW window");
+			}
 
-void GLFWWindow::show() { glfwShowWindow(m_window); }
-void GLFWWindow::hide() { glfwHideWindow(m_window); }
+			glfwSetWindowUserPointer(window, this);
+			glfwSetWindowCloseCallback(window, window_close_callback);
+		}
 
-void GLFWWindow::setTitle(const std::string& title) { glfwSetWindowTitle(m_window, title.c_str()); }
+		~Impl() {
+			if (window) {
+				glfwDestroyWindow(window);
+			}
+		}
+	};
 
-void GLFWWindow::setSize(uint32_t width, uint32_t height) { glfwSetWindowSize(m_window, width, height); }
+	GLFWWindow::GLFWWindow(const WindowConfig& config) :
+		m_impl(std::make_unique<Impl>(config)) {
+	}
 
-void GLFWWindow::getSize(uint32_t& width, uint32_t& height) const {
-    int w, h;
-    glfwGetWindowSize(m_window, &w, &h);
-    width = w;
-    height = h;
-}
+	GLFWWindow::~GLFWWindow() = default;
 
-bool GLFWWindow::shouldClose() const { return m_shouldClose || glfwWindowShouldClose(m_window); }
+	void GLFWWindow::show() { 
+		glfwShowWindow(m_impl->window); 
+	}
+	
+	void GLFWWindow::hide() { 
+		glfwHideWindow(m_impl->window); 
+	}
 
-std::unique_ptr<IGraphicsContext> GLFWWindow::createContext(const ContextConfig& config) {
-    auto ctx = std::make_unique<GLFWGraphicsContext>(m_window, config);
-    return ctx;
-}
+	void GLFWWindow::setTitle(const std::string& title) { 
+		glfwSetWindowTitle(m_impl->window, title.c_str()); 
+	}
 
-void GLFWWindow::markForClose() { m_shouldClose = true; }
+	void GLFWWindow::setSize(uint32_t width, uint32_t height) { 
+		glfwSetWindowSize(m_impl->window, width, height); 
+	}
 
-void GLFWWindow::setRelativeMouseMode(bool enabled) {
-    glfwSetInputMode(m_window, GLFW_CURSOR, enabled ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
-}
+	void GLFWWindow::getSize(uint32_t& width, uint32_t& height) const {
+		int w, h;
+		glfwGetWindowSize(m_impl->window, &w, &h);
+		width = w;
+		height = h;
+	}
 
-bool GLFWWindow::getRelativeMouseMode() const {
-    return glfwGetInputMode(m_window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
-}
+	void* GLFWWindow::getNativeHandle() const
+	{
+		return m_impl->window;
+	}
 
-void GLFWWindow::setMouseGrab(bool grabbed) {
-    glfwSetInputMode(m_window, GLFW_CURSOR, grabbed ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
-}
+	std::unique_ptr<IGraphicsContext> GLFWWindow::createContext(const ContextConfig& config) {
+		auto ctx = std::make_unique<GLFWGraphicsContext>(m_impl->window, config);
+		glfwSwapInterval(this->m_impl->m_config.vsync ? 1 : 0);
+		return ctx;
+	}
 
-bool GLFWWindow::getMouseGrab() const {
-    return glfwGetInputMode(m_window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
-}
+	void GLFWWindow::setRelativeMouseMode(bool enabled) {
+		glfwSetInputMode(m_impl->window, GLFW_CURSOR, enabled ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+	}
+
+	bool GLFWWindow::getRelativeMouseMode() const {
+		return glfwGetInputMode(m_impl->window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
+	}
+
+	void GLFWWindow::setMouseGrab(bool grabbed) {
+		glfwSetInputMode(m_impl->window, GLFW_CURSOR, grabbed ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+	}
+
+	bool GLFWWindow::getMouseGrab() const {
+		return glfwGetInputMode(m_impl->window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
+	}
+
+	WindowID GLFWWindow::getWindowID() const
+	{
+		return reinterpret_cast<WindowID>(m_impl->window);
+	}
 
 } // namespace pgrender::backends::glfw

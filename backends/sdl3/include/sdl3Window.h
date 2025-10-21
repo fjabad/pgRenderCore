@@ -3,7 +3,6 @@
 
 // Forward declarations - NO incluir SDL3
 struct SDL_Window;
-typedef uint32_t SDL_WindowID;
 
 namespace pgrender::backends::sdl3 {
 
@@ -18,7 +17,6 @@ namespace pgrender::backends::sdl3 {
 		void setTitle(const std::string& title) override;
 		void setSize(uint32_t width, uint32_t height) override;
 		void getSize(uint32_t& width, uint32_t& height) const override;
-		bool shouldClose() const override;
 		void* getNativeHandle() const override;
 
 		std::unique_ptr<IGraphicsContext> createContext(const ContextConfig& config) override;
@@ -29,8 +27,7 @@ namespace pgrender::backends::sdl3 {
 		void setMouseGrab(bool grabbed) override;
 		bool getMouseGrab() const override;
 
-		SDL_WindowID getWindowID() const;
-		void markForClose();
+		WindowID getWindowID() const override;
 
 	private:
 		// PIMPL: Ocultar detalles de implementación

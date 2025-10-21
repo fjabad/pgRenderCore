@@ -1,5 +1,5 @@
-#include <pgrender/RenderCore.hpp>
-#include <pgrender/RenderCoreFactory.hpp>
+//#include <pgrender/RenderCore.hpp>
+#include <renderCoreFactory.h>
 #include <iostream>
 
 int main(int argc, char** argv) {
@@ -33,7 +33,11 @@ int main(int argc, char** argv) {
         config.height = 720;
         config.renderBackend = pgrender::RenderBackend::OpenGL4;
         
-        auto window = context->createWindow(config);
+		
+		auto& wm = context->getWindowManager();
+        
+        auto windowID = wm.createWindow(config);
+		auto window = wm.getWindow(windowID);
         auto graphicsContext = window->createContext(pgrender::RenderBackend::OpenGL4);
         graphicsContext->makeCurrent();
         
@@ -41,13 +45,12 @@ int main(int argc, char** argv) {
         std::cout << "Presiona ESC para salir\n";
         
         // Loop principal
-        auto& events = context->getEventSystem();
         
         while (!window->shouldClose()) {
-            events.pollEvents();
+            wm.pollEvents();
             
             pgrender::Event event;
-            while (events.getEvent(event)) {
+            while (wm.getEventForWindow(windowID, event)) {
                 if (event.type == pgrender::EventType::KeyPress) {
                     if (event.key.key == pgrender::KeyCode::Escape) {
                         std::cout << "Cerrando aplicación...\n";

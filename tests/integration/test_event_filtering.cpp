@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <pgrender/renderCore.h>
-#include <pgrender/renderCoreFactory.h>
+#include <renderCoreFactory.h>
 
 class EventFilteringTest : public ::testing::Test {
 protected:

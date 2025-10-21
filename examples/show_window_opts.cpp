@@ -1,12 +1,12 @@
 #include <pgrender/renderCore.h>
-#include <pgrender/renderCoreFactory.h>
+#include <renderCoreFactory.h>
 #include <iostream>
 #include <thread>
 #include <chrono>
 
 int main() {
 	try {
-		// Crear contexto (backend seleccionado autom·ticamente)
+		// Crear contexto (backend seleccionado autom√°ticamente)
 		auto context = pgrender::RenderCoreFactory::createContext(pgrender::WindowBackend::Auto);
 
 		// Obtener el window manager (siempre disponible)
@@ -14,7 +14,7 @@ int main() {
 
 		// Configurar ventana
 		pgrender::WindowConfig config;
-		config.title = "PGRenderCore - Ventana B·sica";
+		config.title = "PGRenderCore - Ventana B√°sica";
 		config.width = 1280;
 		config.height = 720;
 		config.resizable = true;
@@ -31,7 +31,7 @@ int main() {
 			return 1;
 		}
 
-		// Crear y asociar contexto gr·fico
+		// Crear y asociar contexto gr√°fico
 		pgrender::ContextConfig ctxConfig;
 		ctxConfig.backend = pgrender::RenderBackend::OpenGL4;
 		ctxConfig.majorVersion = 4;
@@ -46,17 +46,17 @@ int main() {
 
 		std::cout << "Ventana creada exitosamente\n";
 		std::cout << "  ID: " << windowId << "\n";
-		std::cout << "  TamaÒo: " << config.width << "x" << config.height << "\n";
+		std::cout << "  Tama√±o: " << config.width << "x" << config.height << "\n";
 
 		auto* ctx = windowMgr.getWindowContext(windowId);
 		if (ctx) {
 			std::cout << "  Backend: "
 				<< (ctx->getBackend() == pgrender::RenderBackend::OpenGL4 ? "OpenGL 4.x" : "Otro")
 				<< "\n";
-			std::cout << "  Compartido: " << (ctx->isShared() ? "SÌ" : "No") << "\n";
+			std::cout << "  Compartido: " << (ctx->isShared() ? "S√≠" : "No") << "\n";
 		}
 
-		// Mostrar informaciÛn de displays
+		// Mostrar informaci√≥n de displays
 		std::cout << "\nDisplays disponibles: " << windowMgr.getDisplayCount() << "\n";
 		for (int i = 0; i < windowMgr.getDisplayCount(); ++i) {
 			auto displayInfo = windowMgr.getDisplayInfo(i);
@@ -76,7 +76,7 @@ int main() {
 			});
 
 		std::cout << "\n=== Controles ===\n";
-		std::cout << "ESC - Cerrar aplicaciÛn\n";
+		std::cout << "ESC - Cerrar aplicaci√≥n\n";
 		std::cout << "F - Toggle fullscreen\n";
 		std::cout << "M - Maximizar ventana\n";
 		std::cout << "R - Restaurar ventana\n";
@@ -149,7 +149,7 @@ int main() {
 					break;
 
 				case pgrender::EventType::WindowLostFocus:
-					std::cout << "Ventana perdiÛ el foco\n";
+					std::cout << "Ventana perdi√≥ el foco\n";
 					break;
 
 				case pgrender::EventType::WindowMinimized:
@@ -177,7 +177,7 @@ int main() {
 			if (renderCtx) {
 				renderCtx->makeCurrent();
 
-				// AquÌ irÌa tu cÛdigo de renderizado OpenGL
+				// Aqu√≠ ir√≠a tu c√≥digo de renderizado OpenGL
 				// Ejemplo:
 				// glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
 				// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -190,7 +190,7 @@ int main() {
 			frameCount++;
 		}
 
-		std::cout << "AplicaciÛn finalizada correctamente (frames totales: "
+		std::cout << "Aplicaci√≥n finalizada correctamente (frames totales: "
 			<< frameCount << ")\n";
 
 	}

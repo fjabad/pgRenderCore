@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <pgrender/renderCore.h>
-#include <pgrender/renderCoreFactory.h>
+#include <renderCoreFactory.h>
 #include <thread>
 #include <chrono>
 

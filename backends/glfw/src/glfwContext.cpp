@@ -1,46 +1,100 @@
-#include "pgrender/backends/glfw/GLFWContext.hpp"
+#include "glfwContext.h"
+#include <GLFW/glfw3.h>
 #include <stdexcept>
 
 namespace pgrender::backends::glfw {
 
-GLFWGraphicsContext::GLFWGraphicsContext(GLFWwindow* window, const ContextConfig& config)
-    : m_window(window) {
-    if (!window) {
-        throw std::runtime_error("Invalid window handle for GLFW context creation");
-    }
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(config.vsync ? 1 : 0);
-}
+	class GLFWGraphicsContext::Impl {
+	public:
+		GLFWwindow* window = nullptr;
+		RenderBackend backend = RenderBackend::Auto;
+		bool ownsWindow = false;
+		IGraphicsContext* shareContext = nullptr;
+		void configure(GLFWwindow* window, const ContextConfig& config);
+		void configureAttributes(const ContextConfig& config) {
+			if (config.backend == RenderBackend::OpenGL4) {
+				glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, config.majorVersion);
+				glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, config.minorVersion);
+				glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-GLFWGraphicsContext::GLFWGraphicsContext(const ContextConfig& config) {
-    if (!glfwInit()) throw std::runtime_error("GLFW Init failed");
+				if (config.debugContext) {
+					glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+				}
+			}
+		}
 
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, config.majorVersion);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, config.minorVersion);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, config.debugContext ? GLFW_TRUE : GLFW_FALSE);
+		~Impl() {
+			if (ownsWindow && window) {
+				glfwDestroyWindow(window);
+			}
+		}
+	};
 
-    m_window = glfwCreateWindow(1, 1, "", nullptr, nullptr);
-    if (!m_window) throw std::runtime_error("Failed to create headless GLFW context");
+	GLFWGraphicsContext::GLFWGraphicsContext(void* window, const ContextConfig& config)
+		: m_impl(std::make_unique<Impl>())
+	{
+		if (!window) {
+			throw std::runtime_error("Invalid window handle for GLFW context creation");
+		}
+		m_impl->configure(static_cast<GLFWwindow *>(window), config);
+	}
 
-    m_createdInternally = true;
-    glfwMakeContextCurrent(m_window);
-}
+	GLFWGraphicsContext::GLFWGraphicsContext(const ContextConfig& config) :
+		m_impl(std::make_unique<Impl>())
+	{
+		m_impl->configure(nullptr, config);
+	}
 
-GLFWGraphicsContext::~GLFWGraphicsContext() {
-    if (m_createdInternally && m_window) {
-        glfwDestroyWindow(m_window);
-        glfwTerminate();
-    }
-}
+	void GLFWGraphicsContext::Impl::configure(GLFWwindow* window, const ContextConfig& config)
+	{
+		if (window == nullptr) {
+			glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+			this->window = glfwCreateWindow(1, 1, "", nullptr, nullptr);
+			if (!this->window) throw std::runtime_error("Failed to create headless GLFW context");
+			ownsWindow = true;
+		}
+		else {
+			this->window = window;
+		}
+		configureAttributes(config);
 
-void GLFWGraphicsContext::makeCurrent() {
-    glfwMakeContextCurrent(m_window);
-}
+		backend = config.backend;
+		shareContext = static_cast<IGraphicsContext*>(config.shareContext);
+		glfwMakeContextCurrent(this->window);
+	}
 
-void GLFWGraphicsContext::swapBuffers() {
-    glfwSwapBuffers(m_window);
-}
+	GLFWGraphicsContext::~GLFWGraphicsContext() = default;
+	
+
+	void GLFWGraphicsContext::makeCurrent() {
+		glfwMakeContextCurrent(m_impl->window);
+	}
+
+	void GLFWGraphicsContext::swapBuffers() {
+		glfwSwapBuffers(m_impl->window);
+	}
+
+	void* GLFWGraphicsContext::getNativeHandle() const {
+		return static_cast<void*>(m_impl->window);
+	}
+
+	RenderBackend GLFWGraphicsContext::getBackend() const {
+		return m_impl->backend;
+	}
+
+	bool GLFWGraphicsContext::isShared() const {
+		return m_impl->shareContext != nullptr;
+	}
+
+	IGraphicsContext* GLFWGraphicsContext::getSharedContext() const {
+		return m_impl->shareContext;
+	}
+
+	void* GLFWGraphicsContext::getWindow() const
+	{
+		return static_cast<void*>(m_impl->window);
+	}
+
+
 
 } // namespace pgrender::backends::glfw

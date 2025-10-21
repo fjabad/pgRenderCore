@@ -1,12 +1,12 @@
 #pragma once
-#include "renderCore.h"
+#include "renderCoreFactory.h"
 
 #ifdef PGRENDER_USE_SDL3
-#include "sdl3Features.h"
+#include "sdl3LibraryContext.h"
 #endif
 
 #ifdef PGRENDER_USE_GLFW
-#include "pgrender/backends/glfw/GLFWFeatures.hpp"
+#include "glfwLibraryContext.h"
 #endif
 
 

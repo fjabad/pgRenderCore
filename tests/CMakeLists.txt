@@ -33,62 +33,101 @@ source_group("tests\\integration"
     FILES ${TEST_SOURCES_INTEGR}
 )
 
-# Crear UN SOLO ejecutable con todos los tests
-add_executable(pgrender_tests 
-    ${TEST_SOURCES_UNIT} ${TEST_SOURCES_INTEGR}
-    main.cpp
-)
-
-set_target_properties(pgrender_tests PROPERTIES
-    CXX_STANDARD 20
-    CXX_STANDARD_REQUIRED ON
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
-    FOLDER "PGRenderCore/Tests"
-)
-
-# Vincular con todas las dependencias
-target_link_libraries(pgrender_tests
-    PRIVATE
-        PGRenderCore::Core
-        GTest::gtest
-        GTest::gtest_main
-        GTest::gmock
-)
-
 # Vincular con backends si están disponibles
 if(PGRENDER_BUILD_SDL3_BACKEND)
-    target_link_libraries(pgrender_tests PRIVATE PGRenderCore::SDL3)
-    target_compile_definitions(pgrender_tests PRIVATE PGRENDER_HAS_SDL3)
+	add_executable(pgrender_tests_sdl3
+		${TEST_SOURCES_UNIT} ${TEST_SOURCES_INTEGR}
+		main.cpp
+	)
+
+	set_target_properties(pgrender_tests_sdl3 PROPERTIES
+		CXX_STANDARD 20
+		CXX_STANDARD_REQUIRED ON
+		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
+		FOLDER "PGRenderCore/Tests"
+	)
+
+	# Vincular con todas las dependencias
+	target_link_libraries(pgrender_tests_sdl3
+		PRIVATE
+			PGRenderCore::Core
+			PGRenderCore::Factory
+			PGRenderCore::SDL3
+			GTest::gtest
+			GTest::gtest_main
+			GTest::gmock
+	)
+    target_compile_definitions(pgrender_tests_sdl3 PRIVATE PGRENDER_HAS_SDL3)
+	# OpenGL si está disponible
+	if(OpenGL_FOUND)
+		target_link_libraries(pgrender_tests_sdl3 PRIVATE OpenGL::GL)
+	endif()
+	# Incluir directorios
+	target_include_directories(pgrender_tests_sdl3
+		PRIVATE
+			${CMAKE_CURRENT_SOURCE_DIR}
+	)
+
+	sign_executable(pgrender_tests_sdl3)
 endif()
 
 if(PGRENDER_BUILD_GLFW_BACKEND)
-    target_link_libraries(pgrender_tests PRIVATE PGRenderCore::GLFW)
-    target_compile_definitions(pgrender_tests PRIVATE PGRENDER_HAS_GLFW)
+	add_executable(pgrender_tests_glfw
+		${TEST_SOURCES_UNIT} ${TEST_SOURCES_INTEGR}
+		main.cpp
+	)
+
+	set_target_properties(pgrender_tests_glfw PROPERTIES
+		CXX_STANDARD 20
+		CXX_STANDARD_REQUIRED ON
+		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests"
+		FOLDER "PGRenderCore/Tests"
+	)
+
+	# Vincular con todas las dependencias
+	target_link_libraries(pgrender_tests_glfw
+		PRIVATE
+			PGRenderCore::Core
+			PGRenderCore::Factory
+			PGRenderCore::GLFW
+			GTest::gtest
+			GTest::gtest_main
+			GTest::gmock
+	)
+    target_compile_definitions(pgrender_tests_glfw PRIVATE PGRENDER_HAS_GLFW)
+	# OpenGL si está disponible
+	if(OpenGL_FOUND)
+		target_link_libraries(pgrender_tests_glfw PRIVATE OpenGL::GL)
+	endif()
+	# Incluir directorios
+	target_include_directories(pgrender_tests_glfw
+		PRIVATE
+			${CMAKE_CURRENT_SOURCE_DIR}
+	)
+
+	sign_executable(pgrender_tests_glfw)
+
 endif()
 
-# OpenGL si está disponible
-if(OpenGL_FOUND)
-    target_link_libraries(pgrender_tests PRIVATE OpenGL::GL)
-endif()
 
-# Incluir directorios
-target_include_directories(pgrender_tests
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-sign_executable(pgrender_tests)
 
 # Registrar con CTest (descubrimiento automático de tests)
 include(GoogleTest)
-gtest_discover_tests(pgrender_tests
+gtest_discover_tests(pgrender_tests_sdl3
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests
     PROPERTIES
         LABELS "PGRenderCore"
 )
 
-# También añadir como test simple de CTest
-add_test(NAME pgrender_all_tests 
-    COMMAND pgrender_tests
+gtest_discover_tests(pgrender_tests_glfw
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests
+    PROPERTIES
+        LABELS "PGRenderCore"
 )
+
+
+# También añadir como test simple de CTest
+#add_test(NAME pgrender_all_tests 
+#    COMMAND pgrender_tests
+#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests
+#)

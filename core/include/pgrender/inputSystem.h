@@ -27,9 +27,9 @@ public:
 };
 
 // Sistema de entrada avanzado
-class IAdvancedInputSystem {
+class IInputSystem {
 public:
-	virtual ~IAdvancedInputSystem() = default;
+	virtual ~IInputSystem() = default;
 
 	// Gamepads
 	virtual int getGamepadCount() const = 0;
@@ -48,7 +48,7 @@ public:
 	virtual void captureMouse(bool capture) = 0;
 
 protected:
-	IAdvancedInputSystem() = default;
+	IInputSystem() = default;
 };
 
 

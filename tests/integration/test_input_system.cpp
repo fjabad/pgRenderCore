@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 #include <pgrender/renderCore.h>
-#include <pgrender/renderCoreFactory.h>
+#include <renderCoreFactory.h>
 #include <thread>
+#if PGRENDER_USE_GLFW
+#include <glfwWindow.h>
+#endif
 
 
 class InputSystemTest : public ::testing::Test {
@@ -9,13 +12,32 @@ protected:
 	void SetUp() override {
 		context = pgrender::RenderCoreFactory::createContext();
 		ASSERT_NE(context, nullptr);
+#if PGRENDER_USE_GLFW
+		// el sistema de entrada de GLFW necesita una ventana para ciertas operaciones
+		auto& windowManager = context->getWindowManager();
+		pgrender::WindowConfig config;
+		config.width = config.height = 100;
+		config.title = "InputSystemTest";
+		windowID = windowManager.createWindow(config);
+		window = static_cast<pgrender::backends::glfw::GLFWWindow *>(windowManager.getWindow(windowID));
+		auto ctx = window->createContext(pgrender::ContextConfig{});
+		ctx->makeCurrent();
+#endif
 	}
 
 	void TearDown() override {
+		#if PGRENDER_USE_GLFW
+		auto& windowManager = context->getWindowManager();
+		windowManager.destroyWindow(windowID);
+		#endif
 		context.reset();
 	}
 
 	std::unique_ptr<pgrender::ILibraryContext> context;
+#if PGRENDER_USE_GLFW
+	pgrender::WindowID windowID;
+	pgrender::backends::glfw::GLFWWindow *window;
+#endif
 };
 
 TEST_F(InputSystemTest, GetGamepadCount) {

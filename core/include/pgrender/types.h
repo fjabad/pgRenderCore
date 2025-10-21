@@ -23,7 +23,7 @@ enum class WindowBackend {
 };
 
 // ID único para ventanas
-using WindowID = uint32_t;
+using WindowID = std::uintptr_t;
 
 // Teclas
 enum class KeyCode {

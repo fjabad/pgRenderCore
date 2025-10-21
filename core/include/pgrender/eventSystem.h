@@ -5,45 +5,41 @@
 
 namespace pgrender {
 
-// Sistema de eventos base
-class IEventSystem {
-public:
-    virtual ~IEventSystem() = default;
-    
-    virtual void pollEvents() = 0;
-    virtual bool getEvent(Event& event) = 0;
-    virtual void setEventCallback(std::function<void(const Event&)> callback) = 0;
-    
-    IEventSystem(const IEventSystem&) = delete;
-    IEventSystem& operator=(const IEventSystem&) = delete;
+	class IWindow;
 
-protected:
-    IEventSystem() = default;
-};
+	// Sistema de eventos con cola por ventana
+	class IEventSystem {
+	public:
+		virtual ~IEventSystem();
 
-// Sistema de eventos con cola por ventana
-class IPerWindowEventSystem : public IEventSystem {
-public:
-    virtual ~IPerWindowEventSystem() = default;
-    
-    // Cola por ventana
-    virtual WindowEventQueue* getWindowQueue(WindowID windowId) = 0;
-    virtual bool getEventForWindow(WindowID windowId, Event& event) = 0;
-    
-    // Filtros por ventana
-    virtual void setWindowEventFilter(WindowID windowId, EventFilter filter) = 0;
-    virtual void setWindowEventWatcher(WindowID windowId, EventFilter watcher) = 0;
-    
-    // Gestión de colas
-    virtual void createWindowQueue(WindowID windowId) = 0;
-    virtual void destroyWindowQueue(WindowID windowId) = 0;
-    
-    // Estadísticas
-    virtual size_t getWindowQueueSize(WindowID windowId) const = 0;
-    virtual size_t getTotalQueuedEvents() const = 0;
+		virtual void pollEvents() = 0;
 
-protected:
-    IPerWindowEventSystem() = default;
-};
+		// Cola por ventana, y la de eventos globales para la ventana 0
+		WindowEventQueue* getWindowQueue(WindowID windowId);
+		bool getEventForWindow(WindowID windowId, Event& event);
+		bool getGlobalEvent(Event& event);
+
+		virtual void registerWindow(WindowID windowId, IWindow* window);
+		void unregisterWindow(WindowID windowId);
+
+		// Filtros por ventana
+		void setWindowEventFilter(WindowID windowId, EventFilter filter);
+		void setWindowEventWatcher(WindowID windowId, EventFilter watcher);
+
+		// Gestión de colas
+		void createWindowQueue(WindowID windowId);
+		void destroyWindowQueue(WindowID windowId);
+
+		// Estadísticas
+		size_t getWindowQueueSize(WindowID windowId) const;
+		size_t getTotalQueuedEvents() const;
+
+		// Distribución de eventos a colas
+		void distributeEvent(const Event& event, WindowID targetWindow);
+	protected:
+		IEventSystem();
+		class Impl;
+		std::unique_ptr<Impl> m_impl;
+	};
 
 } // namespace pgrender

@@ -1,8 +1,9 @@
 #pragma once
-#include "pgrender/Window.hpp"
-#include "pgrender/backends/glfw/GLFWContext.hpp"
-#include <GLFW/glfw3.h>
+#include "pgrender/window.h"
 #include <memory>
+
+// Forward declarations - NO incluir GLFW
+struct GLFWwindow;
 
 namespace pgrender::backends::glfw {
 
@@ -16,8 +17,7 @@ namespace pgrender::backends::glfw {
         void setTitle(const std::string& title) override;
         void setSize(uint32_t width, uint32_t height) override;
         void getSize(uint32_t& width, uint32_t& height) const override;
-        bool shouldClose() const override;
-        void* getNativeHandle() const override { return m_window; }
+		void* getNativeHandle() const override;
 
         std::unique_ptr<IGraphicsContext> createContext(const ContextConfig& config) override;
 
@@ -25,14 +25,10 @@ namespace pgrender::backends::glfw {
         bool getRelativeMouseMode() const override;
         void setMouseGrab(bool grabbed) override;
         bool getMouseGrab() const override;
-
-        void markForClose();
-        GLFWwindow* getGLFWHandle() const { return m_window; }
-
+		WindowID getWindowID() const override;
     private:
-        GLFWwindow* m_window = nullptr;
-        WindowConfig m_config;
-        bool m_shouldClose = false;
-    };
+		class Impl;
+		std::unique_ptr<Impl> m_impl;
+	};
 
 } // namespace pgrender::backends::glfw

@@ -88,10 +88,6 @@ namespace pgrender::backends::sdl3 {
 		height = static_cast<uint32_t>(h);
 	}
 
-	bool SDL3Window::shouldClose() const {
-		return m_impl->shouldClose;
-	}
-
 	void* SDL3Window::getNativeHandle() const {
 		return m_impl->window;
 	}
@@ -121,12 +117,8 @@ namespace pgrender::backends::sdl3 {
 	}
 
 
-	SDL_WindowID SDL3Window::getWindowID() const {
+	WindowID SDL3Window::getWindowID() const {
 		return m_impl->windowId;
-	}
-
-	void SDL3Window::markForClose() {
-		m_impl->shouldClose = true;
 	}
 
 } // namespace pgrender::backends::sdl3

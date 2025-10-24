@@ -110,24 +110,24 @@ int main() {
 
 		// Configurar callbacks por ventana
 		windowMgr.setWindowEventCallback(window1Id,
-			[](pgrender::WindowID id, const pgrender::Event& event) {
+			[window1Id](const pgrender::Event& event) {
 				if (event.type == pgrender::EventType::KeyPress) {
-					std::cout << "[Ventana " << id << "] Tecla presionada\n";
+					std::cout << "[Ventana " << window1Id << "] Tecla presionada\n";
 				}
 				if (event.type == pgrender::EventType::WindowFocus) {
-					std::cout << "[Ventana " << id << "] Obtuvo el foco\n";
+					std::cout << "[Ventana " << window1Id << "] Obtuvo el foco\n";
 				}
 			});
 
 		windowMgr.setWindowEventCallback(window2Id,
-			[](pgrender::WindowID id, const pgrender::Event& event) {
+			[window2Id](const pgrender::Event& event) {
 				if (event.type == pgrender::EventType::MouseButtonPress) {
-					std::cout << "[Ventana " << id << "] Click en ("
+					std::cout << "[Ventana " << window2Id << "] Click en ("
 						<< event.mouseButton.x << ", "
 						<< event.mouseButton.y << ")\n";
 				}
 				if (event.type == pgrender::EventType::WindowResize) {
-					std::cout << "[Ventana " << id << "] Redimensionada: "
+					std::cout << "[Ventana " << window2Id << "] Redimensionada: "
 						<< event.windowResize.width << "x"
 						<< event.windowResize.height << "\n";
 				}
@@ -135,9 +135,9 @@ int main() {
 
 		if (window3Id != 0) {
 			windowMgr.setWindowEventCallback(window3Id,
-				[](pgrender::WindowID id, const pgrender::Event& event) {
+				[window3Id](const pgrender::Event& event) {
 					if (event.type == pgrender::EventType::WindowMoved) {
-						std::cout << "[Ventana " << id << "] Movida a ("
+						std::cout << "[Ventana " << window3Id << "] Movida a ("
 							<< event.windowMoved.x << ", "
 							<< event.windowMoved.y << ")\n";
 					}

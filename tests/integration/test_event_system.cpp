@@ -84,7 +84,7 @@ TEST_F(EventSystemTest, WindowEventCallback) {
 	int callbackCount = 0;
 
 	windowMgr.setWindowEventCallback(windowId,
-		[&callbackCount](pgrender::WindowID, const pgrender::Event&) {
+		[&callbackCount](const pgrender::Event&) {
 			callbackCount++;
 		});
 

@@ -67,9 +67,9 @@ int main() {
 
 		// Configurar callback de eventos para esta ventana
 		windowMgr.setWindowEventCallback(windowId,
-			[windowId](pgrender::WindowID id, const pgrender::Event& event) {
+			[windowId](const pgrender::Event& event) {
 				if (event.type == pgrender::EventType::WindowResize) {
-					std::cout << "[Ventana " << id << "] Redimensionada a: "
+					std::cout << "[Ventana " << windowId << "] Redimensionada a: "
 						<< event.windowResize.width << "x"
 						<< event.windowResize.height << "\n";
 				}

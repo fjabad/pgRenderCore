@@ -128,7 +128,7 @@ namespace pgrender {
 		}
 	}
 
-	void IEventSystem::setWindowEventWatcher(WindowID windowId, EventFilter watcher) {
+	void IEventSystem::setWindowEventWatcher(WindowID windowId, EventCallback watcher) {
 		auto* queue = getWindowQueue(windowId);
 		if (queue) {
 			queue->setEventWatcher(watcher);

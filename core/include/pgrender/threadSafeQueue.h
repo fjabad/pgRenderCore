@@ -12,6 +12,7 @@ namespace pgrender {
 
 // Filtro de eventos
 using EventFilter = std::function<bool(const Event&)>;
+using EventCallback = std::function<void(const Event&)>;
 
 // Cola thread-safe genérica
 template<typename T>
@@ -143,7 +144,7 @@ public:
         m_filter = filter;
     }
     
-    void setEventWatcher(EventFilter watcher) {
+    void setEventWatcher(EventCallback watcher) {
         std::lock_guard<std::mutex> lock(m_watcherMutex);
         m_watcher = watcher;
     }
@@ -180,7 +181,7 @@ public:
 private:
     ThreadSafeQueue<Event> m_queue;
     EventFilter m_filter;
-    EventFilter m_watcher;
+	EventCallback m_watcher;
     std::mutex m_filterMutex;
     std::mutex m_watcherMutex;
     std::unordered_set<EventType> m_allowedTypes;

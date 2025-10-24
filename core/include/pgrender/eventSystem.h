@@ -24,7 +24,7 @@ namespace pgrender {
 
 		// Filtros por ventana
 		void setWindowEventFilter(WindowID windowId, EventFilter filter);
-		void setWindowEventWatcher(WindowID windowId, EventFilter watcher);
+		void setWindowEventWatcher(WindowID windowId, EventCallback watcher);
 
 		// Gestión de colas
 		void createWindowQueue(WindowID windowId);

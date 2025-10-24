@@ -42,7 +42,7 @@ int main() {
         mainCtxConfig.debugContext = true;
         
         auto mainContext = mainWindow->createContext(mainCtxConfig);
-        mainContext->makeCurrent();
+        
         
         std::cout << "Contexto principal creado\n";
         
@@ -56,6 +56,8 @@ int main() {
         std::cout << "Contexto de carga creado (compartido: " 
                   << (uploadContext->isShared() ? "sí" : "no") << ")\n";
         
+		mainContext->makeCurrent();
+
         // Iniciar thread de carga
         std::atomic<bool> running{true};
         std::thread worker(uploadThread, uploadContext.get(), std::ref(running));

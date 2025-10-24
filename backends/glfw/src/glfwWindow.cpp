@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <glfwContext.h>
 
+using NativeGLFWWindow = GLFWwindow;
+
 namespace pgrender::backends::glfw {
 
 
@@ -13,7 +15,7 @@ namespace pgrender::backends::glfw {
 
 	class GLFWWindow::Impl {
 	public:
-		GLFWwindow* window = nullptr;
+		NativeGLFWWindow* window = nullptr;
 		WindowConfig m_config;
 		bool m_shouldClose = false;
 

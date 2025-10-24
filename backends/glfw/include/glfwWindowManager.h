@@ -11,31 +11,7 @@ namespace pgrender::backends::glfw {
 
 		// Ventanas
 		WindowID createWindow(const WindowConfig& config) override;
-		void destroyWindow(WindowID id) override;
-		void closeAllWindows() override;
 
-		IWindow* getWindow(WindowID id) override;
-		const IWindow* getWindow(WindowID id) const override;
-		std::vector<WindowID> getActiveWindows() const override;
-		size_t getWindowCount() const override;
-		bool hasOpenWindows() const override;
-
-		// Contextos
-		IGraphicsContext* getWindowContext(WindowID id) override;
-		void setWindowContext(WindowID id, std::unique_ptr<IGraphicsContext> context) override;
-
-		// Eventos
-		void pollEvents() override;
-		bool getEventForWindow(WindowID windowId, Event& event) override;
-		void processWindowClosures() override;
-
-		void setWindowEventCallback(WindowID id, WindowEventCallback callback) override;
-		void setWindowEventFilter(WindowID id, EventFilter filter) override;
-		void setWindowEventWatcher(WindowID id, EventFilter watcher) override;
-		size_t getWindowQueueSize(WindowID id) const override;
-		size_t getTotalQueuedEvents() const override;
-
-		// Displays (stub)
 		int getDisplayCount() const override;
 		DisplayInfo getDisplayInfo(int index) const override;
 		int getWindowDisplayIndex(WindowID windowId) const override;

@@ -7,17 +7,11 @@
 #include <memory>
 
 namespace pgrender {
-
-	/// Callback de eventos por ventana
-	/// @param windowId ID de la ventana que generó el evento
-	/// @param event Evento generado
-	using WindowEventCallback = std::function<void(WindowID, const Event&)>;
-
 	/// Gestor unificado de ventanas
 	/// Gestiona múltiples ventanas, displays, eventos y contextos gráficos
 	class IWindowManager {
 	public:
-		virtual ~IWindowManager() = default;
+		virtual ~IWindowManager();
 
 		// ========================================================================
 		// Gestión de ventanas
@@ -30,28 +24,28 @@ namespace pgrender {
 
 		/// Destruye una ventana existente
 		/// @param id ID de la ventana a destruir
-		virtual void destroyWindow(WindowID id) = 0;
+		void destroyWindow(WindowID id);
 
 		/// Cierra todas las ventanas abiertas
-		virtual void closeAllWindows() = 0;
+		void closeAllWindows();
 
 		/// Obtiene un puntero a una ventana
 		/// @param id ID de la ventana
 		/// @return Puntero a la ventana o nullptr si no existe
-		virtual IWindow* getWindow(WindowID id) = 0;
-		virtual const IWindow* getWindow(WindowID id) const = 0;
+		IWindow* getWindow(WindowID id);
+		const IWindow* getWindow(WindowID id) const;
 
 		/// Obtiene la lista de IDs de ventanas activas
 		/// @return Vector con los IDs de todas las ventanas abiertas
-		virtual std::vector<WindowID> getActiveWindows() const = 0;
+		std::vector<WindowID> getActiveWindows() const;
 
 		/// Obtiene el número de ventanas abiertas
 		/// @return Cantidad de ventanas activas
-		virtual size_t getWindowCount() const = 0;
+		size_t getWindowCount() const;
 
 		/// Verifica si hay ventanas abiertas
 		/// @return true si hay al menos una ventana abierta
-		virtual bool hasOpenWindows() const = 0;
+		bool hasOpenWindows() const;
 
 		// ========================================================================
 		// Gestión de contextos gráficos
@@ -60,12 +54,12 @@ namespace pgrender {
 		/// Obtiene el contexto gráfico asociado a una ventana
 		/// @param id ID de la ventana
 		/// @return Puntero al contexto o nullptr si no tiene
-		virtual IGraphicsContext* getWindowContext(WindowID id) = 0;
+		IGraphicsContext* getWindowContext(WindowID id);
 
 		/// Establece el contexto gráfico de una ventana
 		/// @param id ID de la ventana
 		/// @param context Contexto gráfico a asociar (toma ownership)
-		virtual void setWindowContext(WindowID id, std::unique_ptr<IGraphicsContext> context) = 0;
+		void setWindowContext(WindowID id, std::unique_ptr<IGraphicsContext> context);
 
 		// ========================================================================
 		// Gestión de displays/monitores
@@ -165,34 +159,34 @@ namespace pgrender {
 
 		/// Procesa todos los eventos pendientes del sistema
 		/// Debe llamarse en cada frame del loop principal
-		virtual void pollEvents() = 0;
+		void pollEvents();
 
 		/// Obtiene el siguiente evento de una ventana específica
 		/// @param windowId ID de la ventana
 		/// @param event Referencia donde se almacenará el evento
 		/// @return true si había un evento, false si la cola está vacía
-		virtual bool getEventForWindow(WindowID windowId, Event& event) = 0;
+		bool getEventForWindow(WindowID windowId, Event& event);
 
 		/// Procesa y cierra ventanas marcadas para cerrar
 		/// Debe llamarse después de procesar eventos en cada frame
-		virtual void processWindowClosures() = 0;
+		void processWindowClosures();
 
 		/// Establece un callback que se llama por cada evento de una ventana
 		/// @param windowId ID de la ventana
 		/// @param callback Función a llamar por cada evento
-		virtual void setWindowEventCallback(WindowID windowId, WindowEventCallback callback) = 0;
+		void setWindowEventCallback(WindowID windowId, EventCallback callback);
 
 		/// Establece un filtro de eventos para una ventana
 		/// Solo los eventos que pasen el filtro llegarán a la cola
 		/// @param windowId ID de la ventana
 		/// @param filter Función que retorna true para aceptar el evento
-		virtual void setWindowEventFilter(WindowID windowId, EventFilter filter) = 0;
+		void setWindowEventFilter(WindowID windowId, EventFilter filter);
 
 		/// Establece un observador de eventos para una ventana
 		/// El watcher recibe copia de todos los eventos sin consumirlos
 		/// @param windowId ID de la ventana
 		/// @param watcher Función que recibe cada evento
-		virtual void setWindowEventWatcher(WindowID windowId, EventFilter watcher) = 0;
+		void setWindowEventWatcher(WindowID windowId, EventFilter watcher);
 
 		// ========================================================================
 		// Estadísticas y depuración
@@ -201,20 +195,25 @@ namespace pgrender {
 		/// Obtiene el número de eventos pendientes en la cola de una ventana
 		/// @param windowId ID de la ventana
 		/// @return Cantidad de eventos en cola
-		virtual size_t getWindowQueueSize(WindowID windowId) const = 0;
+		size_t getWindowQueueSize(WindowID windowId) const;
 
 		/// Obtiene el número total de eventos pendientes en todas las ventanas
 		/// @return Cantidad total de eventos en todas las colas
-		virtual size_t getTotalQueuedEvents() const = 0;
+		size_t getTotalQueuedEvents() const;
 
 	protected:
-		IWindowManager() = default;
+		IWindowManager(std::unique_ptr<IEventSystem> eventSystem);
+		
+		void registerWindowCreation(std::unique_ptr<IWindow> window);
 
 		// No copiable ni movible
 		IWindowManager(const IWindowManager&) = delete;
 		IWindowManager& operator=(const IWindowManager&) = delete;
 		IWindowManager(IWindowManager&&) = delete;
 		IWindowManager& operator=(IWindowManager&&) = delete;
+
+		class Impl;
+		std::unique_ptr<Impl> m_impl;
 	};
 
 } // namespace pgrender

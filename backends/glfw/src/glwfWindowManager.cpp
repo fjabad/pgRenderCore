@@ -5,6 +5,8 @@
 #include <glfwContext.h>
 #include <iostream>
 
+using NativeGLFWWindow = GLFWwindow;
+
 namespace pgrender::backends::glfw {
 
 
@@ -14,14 +16,7 @@ namespace pgrender::backends::glfw {
 
 	class GLFWWindowManager::Impl {
 	public:
-		struct WindowData {
-			std::unique_ptr<IWindow> window;
-			std::unique_ptr<IGraphicsContext> context;
-			WindowEventCallback eventCallback;
-		};
 
-		std::unordered_map<WindowID, WindowData> windows;
-		std::unique_ptr<GLFWEventSystem> eventSystem;
 		mutable std::mutex mutex;
 		bool glfwInitialized = false;
 
@@ -35,14 +30,9 @@ namespace pgrender::backends::glfw {
 			glfwSetErrorCallback([](int error, const char* description) {
 				std::cerr << "GLFW Error " << error << ": " << description << std::endl;
 				});
-
-			eventSystem = std::make_unique<GLFWEventSystem>();
 		}
 
 		~Impl() {
-			windows.clear();
-			eventSystem.reset();
-
 			if (glfwInitialized) {
 				glfwTerminate();
 			}
@@ -53,11 +43,15 @@ namespace pgrender::backends::glfw {
 	// Constructor / Destructor
 	// ============================================================================
 
-	GLFWWindowManager::GLFWWindowManager()
-		: m_impl(std::make_unique<Impl>()) {
+	GLFWWindowManager::GLFWWindowManager() :
+		m_impl(std::make_unique<Impl>()),
+		IWindowManager(std::make_unique<GLFWEventSystem>())
+	{
 	}
 
-	GLFWWindowManager::~GLFWWindowManager() = default;
+	GLFWWindowManager::~GLFWWindowManager() {
+		closeAllWindows();
+	}
 
 	// ============================================================================
 	// Gestión de ventanas
@@ -67,139 +61,17 @@ namespace pgrender::backends::glfw {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
 		auto window = std::make_unique<GLFWWindow>(config);
-		auto* glfwWindow = static_cast<GLFWWindow*>(window.get());
-		WindowID windowId = glfwWindow->getWindowID();
-
-		Impl::WindowData data;
-		data.window = std::move(window);
-
-		m_impl->windows[windowId] = std::move(data);
-
-		// Registrar ventana en el sistema de eventos
-		m_impl->eventSystem->registerWindow(windowId, glfwWindow);
+		WindowID windowId = window->getWindowID();
+		registerWindowCreation(std::move(window));
 
 		return windowId;
 	}
 
-	void GLFWWindowManager::destroyWindow(WindowID id) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		auto it = m_impl->windows.find(id);
-		if (it != m_impl->windows.end()) {
-			// Desregistrar del sistema de eventos
-			m_impl->eventSystem->unregisterWindow(id);
-
-			// Destruir contexto y ventana
-			it->second.context.reset();
-			it->second.window.reset();
-
-			m_impl->windows.erase(it);
-		}
-	}
-
-	void GLFWWindowManager::closeAllWindows() {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-
-		for (auto& [id, data] : m_impl->windows) {
-			m_impl->eventSystem->unregisterWindow(id);
-			data.context.reset();
-			data.window.reset();
-		}
-
-		m_impl->windows.clear();
-	}
-
-	std::vector<WindowID> GLFWWindowManager::getActiveWindows() const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		std::vector<WindowID> ids;
-		ids.reserve(m_impl->windows.size());
-		for (const auto& [id, _] : m_impl->windows) {
-			ids.push_back(id);
-		}
-		return ids;
-	}
-
-	size_t GLFWWindowManager::getWindowCount() const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		return m_impl->windows.size();
-	}
-
-	bool GLFWWindowManager::hasOpenWindows() const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		return !m_impl->windows.empty();
-	}
-
-	// ============================================================================
-	// Gestión de contextos gráficos
-	// ============================================================================
-
-	IGraphicsContext* GLFWWindowManager::getWindowContext(WindowID id) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		return (it != m_impl->windows.end()) ? it->second.context.get() : nullptr;
-	}
-
-	void GLFWWindowManager::setWindowContext(WindowID id, std::unique_ptr<IGraphicsContext> context) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		if (it != m_impl->windows.end()) {
-			it->second.context = std::move(context);
-		}
-	}
 
 	// ============================================================================
 	// Sistema de eventos
 	// ============================================================================
 
-	void GLFWWindowManager::pollEvents() {
-		// Procesar eventos capturados por el sistema de eventos
-		m_impl->eventSystem->pollEvents();
-	}
-
-	bool GLFWWindowManager::getEventForWindow(WindowID windowId, Event& event) {
-		return m_impl->eventSystem->getEventForWindow(windowId, event);
-	}
-
-	void GLFWWindowManager::processWindowClosures() {
-		std::vector<WindowID> toClose;
-
-		{
-			std::lock_guard<std::mutex> lock(m_impl->mutex);
-			for (const auto& [id, data] : m_impl->windows) {
-				if (data.window && data.window->shouldClose()) {
-					toClose.push_back(id);
-				}
-			}
-		}
-
-		for (WindowID id : toClose) {
-			destroyWindow(id);
-		}
-	}
-
-	void GLFWWindowManager::setWindowEventCallback(WindowID id, WindowEventCallback callback) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		if (it != m_impl->windows.end()) {
-			it->second.eventCallback = callback;
-		}
-	}
-
-	void GLFWWindowManager::setWindowEventFilter(WindowID id, EventFilter filter) {
-		m_impl->eventSystem->setWindowEventFilter(id, filter);
-	}
-
-	void GLFWWindowManager::setWindowEventWatcher(WindowID id, EventFilter watcher) {
-		m_impl->eventSystem->setWindowEventWatcher(id, watcher);
-	}
-
-	size_t GLFWWindowManager::getWindowQueueSize(WindowID id) const {
-		return m_impl->eventSystem->getWindowQueueSize(id);
-	}
-
-	size_t GLFWWindowManager::getTotalQueuedEvents() const {
-		return m_impl->eventSystem->getTotalQueuedEvents();
-	}
 
 	// ============================================================================
 	// Gestión de displays (implementación básica)
@@ -276,16 +148,22 @@ namespace pgrender::backends::glfw {
 		return info;
 	}
 
+	static NativeGLFWWindow* getGLFWWindowFromID(const GLFWWindowManager& manager, WindowID windowId) {
+		const auto win = manager.getWindow(windowId);
+		if (!win) {
+			return nullptr;
+		}
+		auto window = static_cast<NativeGLFWWindow*>(win->getNativeHandle());
+		return window;
+	}
+
 	int GLFWWindowManager::getWindowDisplayIndex(WindowID windowId) const {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		auto it = m_impl->windows.find(windowId);
-		if (it == m_impl->windows.end() || !it->second.window) {
+		auto window = getGLFWWindowFromID(*this, windowId);
+		if (!window) {
 			return -1;
 		}
-
-		auto* glfwWindow = static_cast<GLFWWindow*>(it->second.window.get());
-		GLFWwindow* window = static_cast<GLFWwindow*>(glfwWindow->getNativeHandle());
 
 		GLFWmonitor* monitor = glfwGetWindowMonitor(window);
 		if (!monitor) {
@@ -329,11 +207,6 @@ namespace pgrender::backends::glfw {
 	void GLFWWindowManager::centerWindowOnDisplay(WindowID windowId, int displayIndex) {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		auto it = m_impl->windows.find(windowId);
-		if (it == m_impl->windows.end() || !it->second.window) {
-			return;
-		}
-
 		int count;
 		GLFWmonitor** monitors = glfwGetMonitors(&count);
 
@@ -349,8 +222,10 @@ namespace pgrender::backends::glfw {
 		int mx, my;
 		glfwGetMonitorPos(monitor, &mx, &my);
 
-		auto* glfwWindow = static_cast<GLFWWindow*>(it->second.window.get());
-		GLFWwindow* window = static_cast<GLFWwindow*>(glfwWindow->getNativeHandle());
+		auto window = getGLFWWindowFromID(*this, windowId);
+		if (!window) {
+			return;
+		}
 
 		int windowWidth, windowHeight;
 		glfwGetWindowSize(window, &windowWidth, &windowHeight);
@@ -368,83 +243,74 @@ namespace pgrender::backends::glfw {
 	void GLFWWindowManager::setWindowPosition(WindowID windowId, int x, int y) {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		auto it = m_impl->windows.find(windowId);
-		if (it != m_impl->windows.end() && it->second.window) {
-			auto* glfwWindow = static_cast<GLFWWindow*>(it->second.window.get());
-			GLFWwindow* window = static_cast<GLFWwindow*>(glfwWindow->getNativeHandle());
-			glfwSetWindowPos(window, x, y);
+		auto window = getGLFWWindowFromID(*this, windowId);
+		if (!window) {
+			return;
 		}
+
+		glfwSetWindowPos(window, x, y);
 	}
 
 	void GLFWWindowManager::getWindowPosition(WindowID windowId, int& x, int& y) const {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		auto it = m_impl->windows.find(windowId);
-		if (it != m_impl->windows.end() && it->second.window) {
-			auto* glfwWindow = static_cast<GLFWWindow*>(it->second.window.get());
-			GLFWwindow* window = static_cast<GLFWwindow*>(glfwWindow->getNativeHandle());
-			glfwGetWindowPos(window, &x, &y);
-		}
-		else {
+		auto window = getGLFWWindowFromID(*this, windowId);
+
+		if (!window) {
 			x = 0;
 			y = 0;
+			return;
 		}
+		glfwGetWindowPos(window, &x, &y);
 	}
 
 	void GLFWWindowManager::maximizeWindow(WindowID windowId) {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		auto it = m_impl->windows.find(windowId);
-		if (it != m_impl->windows.end() && it->second.window) {
-			auto* glfwWindow = static_cast<GLFWWindow*>(it->second.window.get());
-			GLFWwindow* window = static_cast<GLFWwindow*>(glfwWindow->getNativeHandle());
-			glfwMaximizeWindow(window);
+		auto window = getGLFWWindowFromID(*this, windowId);
+		if (!window) {
+			return;
 		}
+		glfwMaximizeWindow(window);
 	}
 
 	void GLFWWindowManager::minimizeWindow(WindowID windowId) {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		auto it = m_impl->windows.find(windowId);
-		if (it != m_impl->windows.end() && it->second.window) {
-			auto* glfwWindow = static_cast<GLFWWindow*>(it->second.window.get());
-			GLFWwindow* window = static_cast<GLFWwindow*>(glfwWindow->getNativeHandle());
-			glfwIconifyWindow(window);
+		auto window = getGLFWWindowFromID(*this, windowId);
+		if (!window) {
+			return;
 		}
+		glfwIconifyWindow(window);
 	}
 
 	void GLFWWindowManager::restoreWindow(WindowID windowId) {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		auto it = m_impl->windows.find(windowId);
-		if (it != m_impl->windows.end() && it->second.window) {
-			auto* glfwWindow = static_cast<GLFWWindow*>(it->second.window.get());
-			GLFWwindow* window = static_cast<GLFWwindow*>(glfwWindow->getNativeHandle());
-			glfwRestoreWindow(window);
+		auto window = getGLFWWindowFromID(*this, windowId);
+		if (!window) {
+			return;
 		}
+		glfwRestoreWindow(window);
 	}
 
 	void GLFWWindowManager::raiseWindow(WindowID windowId) {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		auto it = m_impl->windows.find(windowId);
-		if (it != m_impl->windows.end() && it->second.window) {
-			auto* glfwWindow = static_cast<GLFWWindow*>(it->second.window.get());
-			GLFWwindow* window = static_cast<GLFWwindow*>(glfwWindow->getNativeHandle());
-			glfwFocusWindow(window);
+		auto window = getGLFWWindowFromID(*this, windowId);
+		if (!window) {
+			return;
 		}
+		glfwFocusWindow(window);
 	}
 
 	void GLFWWindowManager::setFullscreen(WindowID windowId, bool fullscreen) {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		auto it = m_impl->windows.find(windowId);
-		if (it == m_impl->windows.end() || !it->second.window) {
+		auto window = getGLFWWindowFromID(*this, windowId);
+		if (!window) {
 			return;
 		}
-
-		auto* glfwWindow = static_cast<GLFWWindow*>(it->second.window.get());
-		GLFWwindow* window = static_cast<GLFWwindow*>(glfwWindow->getNativeHandle());
 
 		if (fullscreen) {
 			// Obtener el monitor primario
@@ -464,13 +330,10 @@ namespace pgrender::backends::glfw {
 		// Simulamos con una ventana sin bordes del tamaño del monitor
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		auto it = m_impl->windows.find(windowId);
-		if (it == m_impl->windows.end() || !it->second.window) {
+		auto window = getGLFWWindowFromID(*this, windowId);
+		if (!window) {
 			return;
 		}
-
-		auto* glfwWindow = static_cast<GLFWWindow*>(it->second.window.get());
-		GLFWwindow* window = static_cast<GLFWwindow*>(glfwWindow->getNativeHandle());
 
 		if (fullscreen) {
 			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -491,49 +354,30 @@ namespace pgrender::backends::glfw {
 	void GLFWWindowManager::setWindowOpacity(WindowID windowId, float opacity) {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		auto it = m_impl->windows.find(windowId);
-		if (it != m_impl->windows.end() && it->second.window) {
-			auto* glfwWindow = static_cast<GLFWWindow*>(it->second.window.get());
-			GLFWwindow* window = static_cast<GLFWwindow*>(glfwWindow->getNativeHandle());
-			glfwSetWindowOpacity(window, opacity);
+		auto window = getGLFWWindowFromID(*this, windowId);
+		if (!window) {
+			return;
 		}
+		glfwSetWindowOpacity(window, opacity);
 	}
 
 	float GLFWWindowManager::getWindowOpacity(WindowID windowId) const {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		auto it = m_impl->windows.find(windowId);
-		if (it != m_impl->windows.end() && it->second.window) {
-			auto* glfwWindow = static_cast<GLFWWindow*>(it->second.window.get());
-			GLFWwindow* window = static_cast<GLFWwindow*>(glfwWindow->getNativeHandle());
-			return glfwGetWindowOpacity(window);
+		auto window = getGLFWWindowFromID(*this, windowId);
+		if (!window) {
+			return 1;
 		}
-
-		return 1.0f;
+		return glfwGetWindowOpacity(window);
 	}
 
 	void GLFWWindowManager::setBordered(WindowID windowId, bool bordered) {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
-		auto it = m_impl->windows.find(windowId);
-		if (it != m_impl->windows.end() && it->second.window) {
-			auto* glfwWindow = static_cast<GLFWWindow*>(it->second.window.get());
-			GLFWwindow* window = static_cast<GLFWwindow*>(glfwWindow->getNativeHandle());
-			glfwSetWindowAttrib(window, GLFW_DECORATED, bordered ? GLFW_TRUE : GLFW_FALSE);
+		auto window = getGLFWWindowFromID(*this, windowId);
+		if (!window) {
+			return;
 		}
+		glfwSetWindowAttrib(window, GLFW_DECORATED, bordered ? GLFW_TRUE : GLFW_FALSE);
 	}
-
-	IWindow* GLFWWindowManager::getWindow(WindowID id) {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		return (it != m_impl->windows.end()) ? it->second.window.get() : nullptr;
-	}
-
-	const IWindow* GLFWWindowManager::getWindow(WindowID id) const {
-		std::lock_guard<std::mutex> lock(m_impl->mutex);
-		auto it = m_impl->windows.find(id);
-		return (it != m_impl->windows.end()) ? it->second.window.get() : nullptr;
-	}
-
-
 }

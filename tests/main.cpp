@@ -55,5 +55,20 @@ int main(int argc, char** argv) {
 	// Añadir nuestro listener personalizado
 	//listeners.Append(new TestProgressListener);
 
-	return RUN_ALL_TESTS();
+	auto result = RUN_ALL_TESTS();
+
+	std::cout << "========================================\n";
+	std::cout << "========================================\n";
+#ifdef PGRENDER_USE_GLFW
+	std::cout << "USING the GLWF backend\n";
+#elif PGRENDER_USE_SDL3
+	std::cout << "Using the SDL3 backend\n";
+#elif
+#error "No window backend defined"
+#endif
+	std::cout << "========================================\n";
+	std::cout << "========================================\n";
+
+
+	return result;
 }

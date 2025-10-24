@@ -54,7 +54,11 @@ install(DIRECTORY include/
 )
 
 # Instalar target
-install(TARGETS pgrender_factory
+# install(TARGETS pgrender_factory
+    # EXPORT PGRenderCoreTargets
+#     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+# )
+
+install(TARGETS pgrender_factory pgrender_glfw glfw
     EXPORT PGRenderCoreTargets
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )

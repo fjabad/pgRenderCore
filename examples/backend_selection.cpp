@@ -1,7 +1,7 @@
 //#include <pgrender/RenderCore.hpp>
 #include <renderCoreFactory.h>
 #include <iostream>
-
+#include <thread>
 int main(int argc, char** argv) {
     try {
         // Seleccionar backend desde línea de comandos

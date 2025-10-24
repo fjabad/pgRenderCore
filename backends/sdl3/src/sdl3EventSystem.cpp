@@ -8,9 +8,9 @@ namespace pgrender::backends::sdl3 {
 	static KeyCode translateKeyCode(SDL_Keycode key);
 	static MouseButton translateMouseButton(uint8_t button);
 
-	SDL3PerWindowEventSystem::~SDL3PerWindowEventSystem() = default;
+	SDL3EventSystem::~SDL3EventSystem() = default;
 
-	void SDL3PerWindowEventSystem::pollEvents() {
+	void SDL3EventSystem::pollEvents() {
 		SDL_Event sdlEvent;
 
 		while (SDL_PollEvent(&sdlEvent)) {

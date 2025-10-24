@@ -4,16 +4,16 @@
 
 namespace pgrender::backends::sdl3 {
 
-	class SDL3PerWindowEventSystem : public IEventSystem {
+	class SDL3EventSystem : public IEventSystem {
 	public:
-		SDL3PerWindowEventSystem() = default;
-		~SDL3PerWindowEventSystem();
+		SDL3EventSystem() = default;
+		~SDL3EventSystem();
 
 		// No copiable ni movible
-		SDL3PerWindowEventSystem(const SDL3PerWindowEventSystem&) = delete;
-		SDL3PerWindowEventSystem& operator=(const SDL3PerWindowEventSystem&) = delete;
-		SDL3PerWindowEventSystem(SDL3PerWindowEventSystem&&) = delete;
-		SDL3PerWindowEventSystem& operator=(SDL3PerWindowEventSystem&&) = delete;
+		SDL3EventSystem(const SDL3EventSystem&) = delete;
+		SDL3EventSystem& operator=(const SDL3EventSystem&) = delete;
+		SDL3EventSystem(SDL3EventSystem&&) = delete;
+		SDL3EventSystem& operator=(SDL3EventSystem&&) = delete;
 
 		void pollEvents() override;
 	};

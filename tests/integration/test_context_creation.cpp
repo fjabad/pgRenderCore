@@ -1,23 +1,24 @@
 #include <gtest/gtest.h>
-#include <pgrender/renderCore.h>
-#include <renderCoreFactory.h>
+#include <pgrender/app.h>
+#include <pgrender/windowManager.h>
+#include <appFactory.h>
 
 class ContextCreationTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		context = pgrender::RenderCoreFactory::createContext();
-		ASSERT_NE(context, nullptr);
+		app = pgrender::AppFactory::createApp();
+		ASSERT_NE(app, nullptr);
 	}
 
 	void TearDown() override {
-		context.reset();
+		app.reset();
 	}
 
-	std::unique_ptr<pgrender::ILibraryContext> context;
+	std::unique_ptr<pgrender::App> app;
 };
 
 TEST_F(ContextCreationTest, CreateWindowContext) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -50,7 +51,7 @@ TEST_F(ContextCreationTest, CreateHeadlessContext) {
 	pgrender::ContextConfig config;
 	config.backend = pgrender::RenderBackend::OpenGL4;
 
-	auto headlessContext = context->createHeadlessContext(config);
+	auto headlessContext = app->createHeadlessContext(config);
 
 	ASSERT_NE(headlessContext, nullptr);
 	EXPECT_EQ(headlessContext->getBackend(), pgrender::RenderBackend::OpenGL4);
@@ -58,7 +59,7 @@ TEST_F(ContextCreationTest, CreateHeadlessContext) {
 }
 
 TEST_F(ContextCreationTest, MakeContextCurrent) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;

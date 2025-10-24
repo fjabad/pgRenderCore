@@ -1,35 +1,35 @@
-#include "glfwLibraryContext.h"
+#include "glfwApp.h"
 #include "glfwWindowManager.h"
 #include "glfwInputSystem.h"
 
 #include <glfwContext.h>
 namespace pgrender::backends::glfw{
 	// ============================================================================
-	// GLFWLibraryContext::Impl
+	// GLFWApp::Impl
 	// ============================================================================
 
-	class GLFWLibraryContext::Impl {
+	class GLFWApp::Impl {
 	public:
 
 		GLFWWindowManager windowManager;
 		GLFWInputSystem inputSystem;
 	};
 
-	GLFWLibraryContext::GLFWLibraryContext()
-		: m_impl(std::make_unique<GLFWLibraryContext::Impl>()) {
+	GLFWApp::GLFWApp()
+		: m_impl(std::make_unique<GLFWApp::Impl>()) {
 	}
 
-	GLFWLibraryContext::~GLFWLibraryContext() = default;
+	GLFWApp::~GLFWApp() = default;
 
-	std::unique_ptr<IGraphicsContext> GLFWLibraryContext::createHeadlessContext(const ContextConfig& config) {
+	std::unique_ptr<IGraphicsContext> GLFWApp::createHeadlessContext(const ContextConfig& config) {
 		return std::make_unique<GLFWGraphicsContext>(config);
 	}
 
-	IWindowManager& GLFWLibraryContext::getWindowManager() {
+	IWindowManager& GLFWApp::getWindowManager() {
 		return m_impl->windowManager;
 	}
 
-	IInputSystem& GLFWLibraryContext::getInputSystem() {
+	IInputSystem& GLFWApp::getInputSystem() {
 		return m_impl->inputSystem;
 	}
 

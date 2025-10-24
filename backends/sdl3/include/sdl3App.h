@@ -1,7 +1,7 @@
 #pragma once
 #include "pgrender/windowManager.h"
 #include "pgrender/inputSystem.h"
-#include "pgrender/renderCore.h"
+#include "pgrender/app.h"
 #include <memory>
 
 namespace pgrender::backends::sdl3 {
@@ -10,15 +10,15 @@ namespace pgrender::backends::sdl3 {
 	// Library Context
 	// ============================================================================
 
-	class SDL3LibraryContext : public ILibraryContext {
+	class SDL3App : public App {
 	public:
-		SDL3LibraryContext();
-		~SDL3LibraryContext() override;
+		SDL3App();
+		~SDL3App() override;
 
-		SDL3LibraryContext(const SDL3LibraryContext&) = delete;
-		SDL3LibraryContext& operator=(const SDL3LibraryContext&) = delete;
-		SDL3LibraryContext(SDL3LibraryContext&&) = delete;
-		SDL3LibraryContext& operator=(SDL3LibraryContext&&) = delete;
+		SDL3App(const SDL3App&) = delete;
+		SDL3App& operator=(const SDL3App&) = delete;
+		SDL3App(SDL3App&&) = delete;
+		SDL3App& operator=(SDL3App&&) = delete;
 
 		std::unique_ptr<IGraphicsContext> createHeadlessContext(const ContextConfig& config) override;
 

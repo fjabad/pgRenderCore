@@ -1,23 +1,24 @@
 #include <gtest/gtest.h>
-#include <pgrender/renderCore.h>
-#include <renderCoreFactory.h>
+#include <pgrender/app.h>
+#include <pgrender/windowManager.h>
+#include <appFactory.h>
 
 class DisplayManagementTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		context = pgrender::RenderCoreFactory::createContext();
-		ASSERT_NE(context, nullptr);
+		app = pgrender::AppFactory::createApp();
+		ASSERT_NE(app, nullptr);
 	}
 
 	void TearDown() override {
-		context.reset();
+		app.reset();
 	}
 
-	std::unique_ptr<pgrender::ILibraryContext> context;
+	std::unique_ptr<pgrender::App> app;
 };
 
 TEST_F(DisplayManagementTest, GetDisplayCount) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	int displayCount = windowMgr.getDisplayCount();
 
@@ -25,7 +26,7 @@ TEST_F(DisplayManagementTest, GetDisplayCount) {
 }
 
 TEST_F(DisplayManagementTest, GetDisplayInfo) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	int displayCount = windowMgr.getDisplayCount();
 	ASSERT_GT(displayCount, 0);
@@ -43,7 +44,7 @@ TEST_F(DisplayManagementTest, GetDisplayInfo) {
 }
 
 TEST_F(DisplayManagementTest, GetPrimaryDisplayInfo) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	auto primaryDisplay = windowMgr.getDisplayInfo(0);
 
@@ -54,7 +55,7 @@ TEST_F(DisplayManagementTest, GetPrimaryDisplayInfo) {
 }
 
 TEST_F(DisplayManagementTest, GetWindowDisplayIndex) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -71,7 +72,7 @@ TEST_F(DisplayManagementTest, GetWindowDisplayIndex) {
 }
 
 TEST_F(DisplayManagementTest, CenterWindowOnDisplay) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;

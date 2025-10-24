@@ -1,5 +1,6 @@
-#include <pgrender/renderCore.h>
-#include <renderCoreFactory.h>
+#include <pgrender/app.h>
+#include <pgrender/windowManager.h>
+#include <appFactory.h>
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -7,10 +8,10 @@
 int main() {
 	try {
 		// Crear contexto (backend seleccionado automáticamente)
-		auto context = pgrender::RenderCoreFactory::createContext(pgrender::WindowBackend::Auto);
+		auto app = pgrender::AppFactory::createApp(pgrender::WindowBackend::Auto);
 
 		// Obtener el window manager (siempre disponible)
-		auto& windowMgr = context->getWindowManager();
+		auto& windowMgr = app->getWindowManager();
 
 		// Configurar ventana
 		pgrender::WindowConfig config;

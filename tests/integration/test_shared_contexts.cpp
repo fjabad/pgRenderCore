@@ -1,23 +1,24 @@
 #include <gtest/gtest.h>
-#include <pgrender/renderCore.h>
-#include <renderCoreFactory.h>
+#include <pgrender/app.h>
+#include <pgrender/windowManager.h>
+#include <appFactory.h>
 
 class SharedContextsTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		context = pgrender::RenderCoreFactory::createContext();
-		ASSERT_NE(context, nullptr);
+		app = pgrender::AppFactory::createApp();
+		ASSERT_NE(app, nullptr);
 	}
 
 	void TearDown() override {
-		context.reset();
+		app.reset();
 	}
 
-	std::unique_ptr<pgrender::ILibraryContext> context;
+	std::unique_ptr<pgrender::App> app;
 };
 
 TEST_F(SharedContextsTest, CreateSharedContext) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	// Crear ventana principal
 	pgrender::WindowConfig config;
@@ -56,7 +57,7 @@ TEST_F(SharedContextsTest, CreateSharedContext) {
 }
 
 TEST_F(SharedContextsTest, HeadlessSharedContext) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	// Crear ventana con contexto
 	pgrender::WindowConfig config;
@@ -75,7 +76,7 @@ TEST_F(SharedContextsTest, HeadlessSharedContext) {
 	headlessConfig.backend = pgrender::RenderBackend::OpenGL4;
 	headlessConfig.shareContext = windowMgr.getWindowContext(windowId);
 
-	auto headlessContext = context->createHeadlessContext(headlessConfig);
+	auto headlessContext = app->createHeadlessContext(headlessConfig);
 
 	ASSERT_NE(headlessContext, nullptr);
 	EXPECT_TRUE(headlessContext->isShared());

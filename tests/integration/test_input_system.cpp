@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
-#include <pgrender/renderCore.h>
-#include <renderCoreFactory.h>
+#include <pgrender/app.h>
+#include <pgrender/windowManager.h>
+#include <pgrender/inputSystem.h>
+#include <appFactory.h>
 #include <thread>
 #if PGRENDER_USE_GLFW
 #include <glfwWindow.h>
@@ -10,38 +12,42 @@
 class InputSystemTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		context = pgrender::RenderCoreFactory::createContext();
-		ASSERT_NE(context, nullptr);
+
 #if PGRENDER_USE_GLFW
+		app = pgrender::AppFactory::createApp(pgrender::WindowBackend::GLFW);
+		ASSERT_NE(app, nullptr);
 		// el sistema de entrada de GLFW necesita una ventana para ciertas operaciones
-		auto& windowManager = context->getWindowManager();
+		auto& windowManager = app->getWindowManager();
 		pgrender::WindowConfig config;
 		config.width = config.height = 100;
 		config.title = "InputSystemTest";
 		windowID = windowManager.createWindow(config);
-		window = static_cast<pgrender::backends::glfw::GLFWWindow *>(windowManager.getWindow(windowID));
+		window = static_cast<pgrender::backends::glfw::GLFWWindow*>(windowManager.getWindow(windowID));
 		auto ctx = window->createContext(pgrender::ContextConfig{});
 		ctx->makeCurrent();
+#elif PGRENDER_USE_SDL3
+		app = pgrender::AppFactory::createApp(pgrender::WindowBackend::SDL3);
+		ASSERT_NE(app, nullptr);
 #endif
 	}
 
 	void TearDown() override {
-		#if PGRENDER_USE_GLFW
-		auto& windowManager = context->getWindowManager();
+#if PGRENDER_USE_GLFW
+		auto& windowManager = app->getWindowManager();
 		windowManager.destroyWindow(windowID);
-		#endif
-		context.reset();
+#endif
+		app.reset();
 	}
 
-	std::unique_ptr<pgrender::ILibraryContext> context;
+	std::unique_ptr<pgrender::App> app;
 #if PGRENDER_USE_GLFW
 	pgrender::WindowID windowID;
-	pgrender::backends::glfw::GLFWWindow *window;
+	pgrender::backends::glfw::GLFWWindow* window;
 #endif
 };
 
 TEST_F(InputSystemTest, GetGamepadCount) {
-	auto& inputSystem = context->getInputSystem();
+	auto& inputSystem = app->getInputSystem();
 
 	int count = inputSystem.getGamepadCount();
 
@@ -50,7 +56,7 @@ TEST_F(InputSystemTest, GetGamepadCount) {
 }
 
 TEST_F(InputSystemTest, GetAvailableGamepads) {
-	auto& inputSystem = context->getInputSystem();
+	auto& inputSystem = app->getInputSystem();
 
 	auto gamepads = inputSystem.getAvailableGamepads();
 
@@ -58,7 +64,7 @@ TEST_F(InputSystemTest, GetAvailableGamepads) {
 }
 
 TEST_F(InputSystemTest, ClipboardOperations) {
-	auto& inputSystem = context->getInputSystem();
+	auto& inputSystem = app->getInputSystem();
 
 	std::string testText = "Hello, PGRenderCore!";
 
@@ -71,7 +77,7 @@ TEST_F(InputSystemTest, ClipboardOperations) {
 }
 
 TEST_F(InputSystemTest, CursorVisibility) {
-	auto& inputSystem = context->getInputSystem();
+	auto& inputSystem = app->getInputSystem();
 
 	// Nota: El estado inicial puede variar
 	bool initialState = inputSystem.isCursorVisible();
@@ -89,7 +95,7 @@ TEST_F(InputSystemTest, CursorVisibility) {
 }
 
 TEST_F(InputSystemTest, CaptureMouse) {
-	auto& inputSystem = context->getInputSystem();
+	auto& inputSystem = app->getInputSystem();
 
 	EXPECT_NO_THROW(inputSystem.captureMouse(true));
 	EXPECT_NO_THROW(inputSystem.captureMouse(false));

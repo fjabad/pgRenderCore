@@ -1,5 +1,6 @@
-#include <pgrender/renderCore.h>
-#include <renderCoreFactory.h>
+#include <pgrender/app.h>
+#include <pgrender/windowManager.h>
+#include <appFactory.h>
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -7,7 +8,7 @@
 int main() {
     try {
         // Crear contexto
-        auto context = pgrender::RenderCoreFactory::createContext(pgrender::WindowBackend::Auto);
+        auto app = pgrender::AppFactory::createApp(pgrender::WindowBackend::Auto);
         
         // Configurar ventana
         pgrender::WindowConfig config;
@@ -17,7 +18,7 @@ int main() {
         config.renderBackend = pgrender::RenderBackend::OpenGL4;
         
 
-        auto &windowManager = context->getWindowManager();
+        auto &windowManager = app->getWindowManager();
 
         // Crear ventana
         auto windowID = windowManager.createWindow(config);

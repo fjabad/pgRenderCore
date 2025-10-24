@@ -1,5 +1,6 @@
-#include <pgrender/renderCore.h>
-#include <renderCoreFactory.h>
+#include <pgrender/app.h>
+#include <pgrender/windowManager.h>
+#include <appFactory.h>
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -7,8 +8,8 @@
 int main() {
 	try {
 		// Crear contexto
-		auto context = pgrender::RenderCoreFactory::createContext();
-		auto& windowMgr = context->getWindowManager();
+		auto app = pgrender::AppFactory::createApp();
+		auto& windowMgr = app->getWindowManager();
 
 		std::cout << "========================================\n";
 		std::cout << "Colas de Eventos por Ventana\n";

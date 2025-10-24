@@ -11,13 +11,13 @@ namespace pgrender::backends::sdl3 {
 
 	class SDL3WindowManager::Impl {
 	public:
-		ILibraryContext& context;
+		App& context;
 		mutable std::mutex mutex;
 
-		explicit Impl(ILibraryContext& ctx) : context(ctx) {}
+		explicit Impl(App& ctx) : context(ctx) {}
 	};
 
-	SDL3WindowManager::SDL3WindowManager(ILibraryContext& context) :
+	SDL3WindowManager::SDL3WindowManager(App& context) :
 		IWindowManager(std::make_unique<SDL3EventSystem>()),
 		m_impl(std::make_unique<Impl>(context)) {
 	}

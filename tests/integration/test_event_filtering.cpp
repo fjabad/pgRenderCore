@@ -1,23 +1,24 @@
 #include <gtest/gtest.h>
-#include <pgrender/renderCore.h>
-#include <renderCoreFactory.h>
+#include <pgrender/app.h>
+#include <pgrender/windowManager.h>
+#include <appFactory.h>
 
 class EventFilteringTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		context = pgrender::RenderCoreFactory::createContext();
-		ASSERT_NE(context, nullptr);
+		app = pgrender::AppFactory::createApp();
+		ASSERT_NE(app, nullptr);
 	}
 
 	void TearDown() override {
-		context.reset();
+		app.reset();
 	}
 
-	std::unique_ptr<pgrender::ILibraryContext> context;
+	std::unique_ptr<pgrender::App> app;
 };
 
 TEST_F(EventFilteringTest, SetEventFilter) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -38,7 +39,7 @@ TEST_F(EventFilteringTest, SetEventFilter) {
 }
 
 TEST_F(EventFilteringTest, SetEventWatcher) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -66,7 +67,7 @@ TEST_F(EventFilteringTest, SetEventWatcher) {
 }
 
 TEST_F(EventFilteringTest, MultipleWindowsWithDifferentFilters) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;

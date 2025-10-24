@@ -1,24 +1,25 @@
 #include <gtest/gtest.h>
-#include <pgrender/renderCore.h>
-#include <renderCoreFactory.h>
+#include <appFactory.h>
+#include <pgrender/app.h>
+#include <pgrender/windowManager.h>
 #include <thread>
 
 class WindowCreationTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		context = pgrender::RenderCoreFactory::createContext();
-		ASSERT_NE(context, nullptr);
+		app = pgrender::AppFactory::createApp();
+		ASSERT_NE(app, nullptr);
 	}
 
 	void TearDown() override {
-		context.reset();
+		app.reset();
 	}
 
-	std::unique_ptr<pgrender::ILibraryContext> context;
+	std::unique_ptr<pgrender::App> app;
 };
 
 TEST_F(WindowCreationTest, CreateSingleWindow) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.title = "Test Window";
@@ -44,7 +45,7 @@ TEST_F(WindowCreationTest, CreateSingleWindow) {
 }
 
 TEST_F(WindowCreationTest, CreateMultipleWindows) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -71,7 +72,7 @@ TEST_F(WindowCreationTest, CreateMultipleWindows) {
 }
 
 TEST_F(WindowCreationTest, WindowVisibility) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -91,7 +92,7 @@ TEST_F(WindowCreationTest, WindowVisibility) {
 }
 
 TEST_F(WindowCreationTest, WindowTitleChange) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.title = "Original Title";
@@ -109,7 +110,7 @@ TEST_F(WindowCreationTest, WindowTitleChange) {
 }
 
 TEST_F(WindowCreationTest, WindowResize) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;

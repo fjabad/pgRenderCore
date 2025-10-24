@@ -1,5 +1,6 @@
-#include <pgrender/renderCore.h>
-#include <renderCoreFactory.h>
+#include <pgrender/app.h>
+#include <pgrender/windowManager.h>
+#include <appFactory.h>
 #include <iostream>
 #include <thread>
 #include <atomic>
@@ -22,7 +23,7 @@ void uploadThread(pgrender::IGraphicsContext* context, std::atomic<bool>& runnin
 
 int main() {
     try {
-        auto context = pgrender::RenderCoreFactory::createContext();
+        auto app = pgrender::AppFactory::createApp();
         
         // Ventana principal
         pgrender::WindowConfig mainConfig;
@@ -31,7 +32,7 @@ int main() {
         mainConfig.height = 720;
         mainConfig.renderBackend = pgrender::RenderBackend::OpenGL4;
         
-        auto& windowManager = context->getWindowManager();
+        auto& windowManager = app->getWindowManager();
         auto mainWindowID = windowManager.createWindow(mainConfig);
 
 		auto* mainWindow = windowManager.getWindow(mainWindowID);
@@ -51,7 +52,7 @@ int main() {
         sharedConfig.backend = pgrender::RenderBackend::OpenGL4;
         sharedConfig.shareContext = mainContext.get();
         
-        auto uploadContext = context->createHeadlessContext(sharedConfig);
+        auto uploadContext = app->createHeadlessContext(sharedConfig);
         
         std::cout << "Contexto de carga creado (compartido: " 
                   << (uploadContext->isShared() ? "sí" : "no") << ")\n";

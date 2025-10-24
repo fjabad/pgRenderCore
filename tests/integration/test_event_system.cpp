@@ -1,23 +1,24 @@
 #include <gtest/gtest.h>
-#include <pgrender/renderCore.h>
-#include <renderCoreFactory.h>
+#include <pgrender/app.h>
+#include <pgrender/windowManager.h>
+#include <appFactory.h>
 
 class EventSystemTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		context = pgrender::RenderCoreFactory::createContext();
-		ASSERT_NE(context, nullptr);
+		app = pgrender::AppFactory::createApp();
+		ASSERT_NE(app, nullptr);
 	}
 
 	void TearDown() override {
-		context.reset();
+		app.reset();
 	}
 
-	std::unique_ptr<pgrender::ILibraryContext> context;
+	std::unique_ptr<pgrender::App> app;
 };
 
 TEST_F(EventSystemTest, PollEventsDoesNotCrash) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -32,7 +33,7 @@ TEST_F(EventSystemTest, PollEventsDoesNotCrash) {
 }
 
 TEST_F(EventSystemTest, GetEventForWindowWithNoEvents) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -52,7 +53,7 @@ TEST_F(EventSystemTest, GetEventForWindowWithNoEvents) {
 }
 
 TEST_F(EventSystemTest, EventQueueSizes) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -73,7 +74,7 @@ TEST_F(EventSystemTest, EventQueueSizes) {
 }
 
 TEST_F(EventSystemTest, WindowEventCallback) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;

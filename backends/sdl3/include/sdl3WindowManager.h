@@ -1,6 +1,6 @@
 #pragma once
 #include "pgrender/windowManager.h"
-#include "pgrender/renderCore.h"
+#include "pgrender/app.h"
 
 #include <memory>
 
@@ -13,7 +13,7 @@ namespace pgrender::backends::sdl3 {
 
 	class SDL3WindowManager : public IWindowManager {
 	public:
-		explicit SDL3WindowManager(ILibraryContext& context);
+		explicit SDL3WindowManager(App& context);
 		~SDL3WindowManager();
 
 		// No copiable ni movible

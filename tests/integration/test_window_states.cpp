@@ -1,24 +1,25 @@
 #include <gtest/gtest.h>
-#include <pgrender/renderCore.h>
-#include <renderCoreFactory.h>
+#include <pgrender/app.h>
+#include <pgrender/windowManager.h>
+#include <appFactory.h>
 #include <thread>
 #include <chrono>
 
 class WindowStatesTest : public ::testing::Test {
 protected:
 	void SetUp() override {
-		context = pgrender::RenderCoreFactory::createContext();
-		ASSERT_NE(context, nullptr);
+		app = pgrender::AppFactory::createApp();
+		ASSERT_NE(app, nullptr);
 	}
 
 	void TearDown() override {
-		context.reset();
+		app.reset();
 	}
 
-	std::unique_ptr<pgrender::ILibraryContext> context;
+	std::unique_ptr<pgrender::App> app;
 
 	void processSomeEvents() {
-		auto& windowMgr = context->getWindowManager();
+		auto& windowMgr = app->getWindowManager();
 		for (int i = 0; i < 3; ++i) {
 			windowMgr.pollEvents();
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -27,7 +28,7 @@ protected:
 };
 
 TEST_F(WindowStatesTest, MaximizeWindow) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -42,7 +43,7 @@ TEST_F(WindowStatesTest, MaximizeWindow) {
 }
 
 TEST_F(WindowStatesTest, MinimizeWindow) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -57,7 +58,7 @@ TEST_F(WindowStatesTest, MinimizeWindow) {
 }
 
 TEST_F(WindowStatesTest, RestoreWindow) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -75,7 +76,7 @@ TEST_F(WindowStatesTest, RestoreWindow) {
 }
 
 TEST_F(WindowStatesTest, RaiseWindow) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -94,7 +95,7 @@ TEST_F(WindowStatesTest, RaiseWindow) {
 }
 
 TEST_F(WindowStatesTest, SetWindowOpacity) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -112,7 +113,7 @@ TEST_F(WindowStatesTest, SetWindowOpacity) {
 }
 
 TEST_F(WindowStatesTest, SetBordered) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -130,7 +131,7 @@ TEST_F(WindowStatesTest, SetBordered) {
 }
 
 TEST_F(WindowStatesTest, SetWindowPosition) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -152,7 +153,7 @@ TEST_F(WindowStatesTest, SetWindowPosition) {
 }
 
 TEST_F(WindowStatesTest, SetFullscreen) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;
@@ -170,7 +171,7 @@ TEST_F(WindowStatesTest, SetFullscreen) {
 }
 
 TEST_F(WindowStatesTest, SetFullscreenDesktop) {
-	auto& windowMgr = context->getWindowManager();
+	auto& windowMgr = app->getWindowManager();
 
 	pgrender::WindowConfig config;
 	config.width = 800;

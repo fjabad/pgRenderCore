@@ -1,12 +1,13 @@
-#include <pgrender/renderCore.h>
-#include <renderCoreFactory.h>
+#include <pgrender/app.h>
+#include <pgrender/windowManager.h>
+#include <appFactory.h>
 #include <iostream>
 
 int main() {
 	try {
 		// Crear contexto (incluye window manager automáticamente)
-		auto context = pgrender::RenderCoreFactory::createContext();
-		auto& windowMgr = context->getWindowManager();
+		auto app = pgrender::AppFactory::createApp();
+		auto& windowMgr = app->getWindowManager();
 
 		// Crear ventanas
 		pgrender::WindowConfig config;

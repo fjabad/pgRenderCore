@@ -50,7 +50,7 @@ if(PGRENDER_BUILD_SDL3_BACKEND)
 	# Vincular con todas las dependencias
 	target_link_libraries(pgrender_tests_sdl3
 		PRIVATE
-			PGRenderCore::Core
+			PGRenderCore::Core::App
 			PGRenderCore::Factory
 			PGRenderCore::SDL3
 			GTest::gtest
@@ -87,7 +87,7 @@ if(PGRENDER_BUILD_GLFW_BACKEND)
 	# Vincular con todas las dependencias
 	target_link_libraries(pgrender_tests_glfw
 		PRIVATE
-			PGRenderCore::Core
+			PGRenderCore::Core::App
 			PGRenderCore::Factory
 			PGRenderCore::GLFW
 			GTest::gtest

@@ -62,7 +62,7 @@ target_include_directories(pgrender_sdl3
 # Vincular con SDL3 usando generator expressions
 target_link_libraries(pgrender_sdl3
     PUBLIC
-        PGRenderCore::Core
+        PGRenderCore::Core::App
     PRIVATE
         $<BUILD_INTERFACE:${SDL3_LIBRARY_TARGET}>
         $<$<PLATFORM_ID:Linux>:${CMAKE_DL_LIBS}>

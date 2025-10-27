@@ -1,6 +1,6 @@
 # Función helper para crear ejemplos
 function(add_pgrender_example name)
-    cmake_parse_arguments(EXAMPLE "" "BACKEND" "SOURCES" ${ARGN})
+    cmake_parse_arguments(EXAMPLE "" "BACKEND" "FRONTEND;SOURCES" ${ARGN})
     
     add_executable(${name} ${EXAMPLE_SOURCES})
     
@@ -18,14 +18,13 @@ function(add_pgrender_example name)
         target_link_libraries(${name} PRIVATE PGRenderCore::GLFW)
     endif()
 
-	target_link_libraries(${name} PRIVATE PGRenderCore::Factory)
-    
-
-    # OpenGL si está disponible
-    if(OpenGL_FOUND)
-        target_link_libraries(${name} PRIVATE OpenGL::GL)
+    # Enlazar con el frontend apropiado
+    if(EXAMPLE_FRONTEND STREQUAL "GL4")
+		target_link_libraries(${name} PRIVATE PGRenderCore::GL4)
     endif()
 
+	target_link_libraries(${name} PRIVATE PGRenderCore::Factory)
+   
     sign_executable(${name})
 endfunction()
 
@@ -39,16 +38,18 @@ foreach(example IN LISTS example_files)
 	message(STATUS "Procesando archivo de ejemplo: ${base_name}")
 
 	if(PGRENDER_BUILD_SDL3_BACKEND)
-	 message(STATUS "Procesando : ${base_name}_sdl3")
-	    add_pgrender_example("${base_name}_sdl3"
+	 message(STATUS "Procesando : ${base_name}_sdl3_gl4")
+	    add_pgrender_example("${base_name}_sdl3_gl4"
 	        BACKEND SDL3
+            FRONTEND GL4
 			SOURCES ${example}
 		)
 	endif()
 	if(PGRENDER_BUILD_GLFW_BACKEND)
-	 message(STATUS "Procesando : ${base_name}_glfw")
-		add_pgrender_example("${base_name}_glfw"
+	 message(STATUS "Procesando : ${base_name}_glfw_gl4")
+		add_pgrender_example("${base_name}_glfw_gl4"
 			BACKEND GLFW
+            FRONTEND GL4
 			SOURCES ${example}
 		)
 	endif()

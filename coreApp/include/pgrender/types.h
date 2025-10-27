@@ -66,21 +66,6 @@ namespace pgrender {
 		GamepadDisconnected
 	};
 
-	// Configuración de ventana
-	struct WindowConfig {
-		std::string title = "PGRenderCore Window";
-		uint32_t width = 800;
-		uint32_t height = 600;
-		bool resizable = true;
-		bool fullscreen = false;
-		bool vsync = true;
-		bool highDPI = false;
-		bool transparent = false;
-		bool alwaysOnTop = false;
-		bool borderless = false;
-		RenderBackend renderBackend = RenderBackend::Auto;
-	};
-
 	// Configuración de contexto gráfico
 	struct ContextConfig {
 		RenderBackend backend = RenderBackend::Auto;

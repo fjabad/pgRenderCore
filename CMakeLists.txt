@@ -14,6 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Opciones del proyecto
 option(PGRENDER_BUILD_SDL3_BACKEND "Build SDL3 backend" ON)
 option(PGRENDER_BUILD_GLFW_BACKEND "Build GLFW backend" ON)
+option(PGRENDER_BUILD_GL4_FRONTEND "Build GL4 frontend" ON)
 option(PGRENDER_BUILD_EXAMPLES "Build example programs" ON)
 option(PGRENDER_BUILD_TESTS "Build tests" OFF)
 option(PGRENDER_BUILD_SHARED_LIBS "Build shared libraries" OFF)
@@ -33,7 +34,8 @@ include(Dependencies)
 include(GNUInstallDirs)
 
 # Librería core 
-add_subdirectory(core)
+add_subdirectory(coreApp)
+add_subdirectory(coreRender)
 
 # Función para firmar un ejecutable en macOS
 function(sign_executable target_name)
@@ -52,6 +54,11 @@ endif()
 
 if(PGRENDER_BUILD_GLFW_BACKEND)
     add_subdirectory(backends/glfw)
+endif()
+
+# Frontends
+if(PGRENDER_BUILD_GL4_FRONTEND)
+	add_subdirectory(frontends/gl4)
 endif()
 
 add_subdirectory(factory)

@@ -47,7 +47,7 @@ target_include_directories(pgrender_glfw
 # Dependencias
 target_link_libraries(pgrender_glfw
     PUBLIC
-        PGRenderCore::Core
+        PGRenderCore::Core::App
         glfw
     PRIVATE
         $<$<PLATFORM_ID:Linux>:${CMAKE_DL_LIBS}>

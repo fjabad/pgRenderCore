@@ -20,7 +20,7 @@ namespace pgrender {
 		/// Crea una nueva ventana
 		/// @param config Configuración de la ventana
 		/// @return ID único de la ventana creada
-		virtual WindowID createWindow(const WindowConfig& config) = 0;
+		virtual WindowID createWindow(const IWindow::Desc& config) = 0;
 
 		/// Destruye una ventana existente
 		/// @param id ID de la ventana a destruir

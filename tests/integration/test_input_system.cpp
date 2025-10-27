@@ -18,7 +18,7 @@ protected:
 		ASSERT_NE(app, nullptr);
 		// el sistema de entrada de GLFW necesita una ventana para ciertas operaciones
 		auto& windowManager = app->getWindowManager();
-		pgrender::WindowConfig config;
+		pgrender::IWindow::Desc config;
 		config.width = config.height = 100;
 		config.title = "InputSystemTest";
 		windowID = windowManager.createWindow(config);

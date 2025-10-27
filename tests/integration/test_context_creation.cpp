@@ -20,7 +20,7 @@ protected:
 TEST_F(ContextCreationTest, CreateWindowContext) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 	config.renderBackend = pgrender::RenderBackend::OpenGL4;
@@ -61,7 +61,7 @@ TEST_F(ContextCreationTest, CreateHeadlessContext) {
 TEST_F(ContextCreationTest, MakeContextCurrent) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 	config.renderBackend = pgrender::RenderBackend::OpenGL4;

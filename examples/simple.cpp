@@ -10,13 +10,16 @@ int main() {
 		auto& windowMgr = app->getWindowManager();
 
 		// Crear ventanas
-		pgrender::WindowConfig config;
+		pgrender::IWindow::Desc config;
 		config.title = "Mi Aplicación";
 		config.width = 1280;
 		config.height = 720;
 
 		auto window1 = windowMgr.createWindow(config);
-		auto window2 = windowMgr.createWindow(config);
+		//auto window2 = windowMgr.createWindow(config);
+
+		pgrender::ContextConfig ctxConfig;
+
 
 		// Loop principal
 		while (windowMgr.hasOpenWindows()) {

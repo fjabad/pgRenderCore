@@ -32,7 +32,7 @@ int main() {
 		std::cout << "========================================\n\n";
 
 		// Crear ventana principal
-		pgrender::WindowConfig config1;
+		pgrender::IWindow::Desc config1;
 		config1.title = "Ventana Principal";
 		config1.width = 1280;
 		config1.height = 720;
@@ -58,7 +58,7 @@ int main() {
 		}
 
 		// Crear ventana secundaria con contexto compartido
-		pgrender::WindowConfig config2;
+		pgrender::IWindow::Desc config2;
 		config2.title = "Ventana Secundaria - Contexto Compartido";
 		config2.width = 800;
 		config2.height = 600;
@@ -84,7 +84,7 @@ int main() {
 		// Crear ventana terciaria en otro display (si hay más de uno)
 		pgrender::WindowID window3Id = 0;
 		if (displayCount > 1) {
-			pgrender::WindowConfig config3;
+			pgrender::IWindow::Desc config3;
 			config3.title = "Ventana Terciaria - Display Secundario";
 			config3.width = 640;
 			config3.height = 480;

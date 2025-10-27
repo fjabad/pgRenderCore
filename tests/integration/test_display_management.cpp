@@ -57,7 +57,7 @@ TEST_F(DisplayManagementTest, GetPrimaryDisplayInfo) {
 TEST_F(DisplayManagementTest, GetWindowDisplayIndex) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 
@@ -74,7 +74,7 @@ TEST_F(DisplayManagementTest, GetWindowDisplayIndex) {
 TEST_F(DisplayManagementTest, CenterWindowOnDisplay) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 

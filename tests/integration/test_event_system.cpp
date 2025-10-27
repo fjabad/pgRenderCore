@@ -20,7 +20,7 @@ protected:
 TEST_F(EventSystemTest, PollEventsDoesNotCrash) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 
@@ -35,7 +35,7 @@ TEST_F(EventSystemTest, PollEventsDoesNotCrash) {
 TEST_F(EventSystemTest, GetEventForWindowWithNoEvents) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 
@@ -55,7 +55,7 @@ TEST_F(EventSystemTest, GetEventForWindowWithNoEvents) {
 TEST_F(EventSystemTest, EventQueueSizes) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 
@@ -76,7 +76,7 @@ TEST_F(EventSystemTest, EventQueueSizes) {
 TEST_F(EventSystemTest, WindowEventCallback) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 

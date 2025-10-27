@@ -20,7 +20,7 @@ protected:
 TEST_F(EventFilteringTest, SetEventFilter) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 
@@ -41,7 +41,7 @@ TEST_F(EventFilteringTest, SetEventFilter) {
 TEST_F(EventFilteringTest, SetEventWatcher) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 
@@ -69,7 +69,7 @@ TEST_F(EventFilteringTest, SetEventWatcher) {
 TEST_F(EventFilteringTest, MultipleWindowsWithDifferentFilters) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 

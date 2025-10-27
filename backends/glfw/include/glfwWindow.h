@@ -9,7 +9,7 @@ namespace pgrender::backends::glfw {
 
     class GLFWWindow : public IWindow {
     public:
-        explicit GLFWWindow(const WindowConfig& config);
+        explicit GLFWWindow(const IWindow::Desc& config);
         ~GLFWWindow() override;
 
         void show() override;

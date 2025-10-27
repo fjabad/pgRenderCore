@@ -8,7 +8,7 @@ namespace pgrender::backends::sdl3 {
 
 	class SDL3Window : public IWindow {
 	public:
-		explicit SDL3Window(const WindowConfig& config);
+		explicit SDL3Window(const IWindow::Desc& config);
 		~SDL3Window() override;
 
 		// IWindow interface

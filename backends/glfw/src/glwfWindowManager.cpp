@@ -57,7 +57,7 @@ namespace pgrender::backends::glfw {
 	// Gestión de ventanas
 	// ============================================================================
 
-	WindowID GLFWWindowManager::createWindow(const WindowConfig& config) {
+	WindowID GLFWWindowManager::createWindow(const IWindow::Desc& config) {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
 		auto window = std::make_unique<GLFWWindow>(config);

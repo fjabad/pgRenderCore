@@ -10,7 +10,7 @@ namespace pgrender::backends::glfw {
 		~GLFWWindowManager() override;
 
 		// Ventanas
-		WindowID createWindow(const WindowConfig& config) override;
+		WindowID createWindow(const IWindow::Desc& config) override;
 
 		int getDisplayCount() const override;
 		DisplayInfo getDisplayInfo(int index) const override;

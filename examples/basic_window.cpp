@@ -11,7 +11,7 @@ int main() {
         auto app = pgrender::AppFactory::createApp(pgrender::WindowBackend::Auto);
         
         // Configurar ventana
-        pgrender::WindowConfig config;
+        pgrender::IWindow::Desc config;
         config.title = "PGRenderCore - Ventana Básica";
         config.width = 1280;
         config.height = 720;

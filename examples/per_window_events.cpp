@@ -16,7 +16,7 @@ int main() {
 		std::cout << "========================================\n\n";
 
 		// Ventana 1: Solo eventos de teclado
-		pgrender::WindowConfig config1;
+		pgrender::IWindow::Desc config1;
 		config1.title = "Ventana 1 - Solo Teclado";
 		config1.width = 800;
 		config1.height = 600;
@@ -26,7 +26,7 @@ int main() {
 		std::cout << "✓ Ventana 1 creada (ID: " << window1Id << ") - Solo teclado\n";
 
 		// Ventana 2: Solo eventos de ratón
-		pgrender::WindowConfig config2;
+		pgrender::IWindow::Desc config2;
 		config2.title = "Ventana 2 - Solo Ratón";
 		config2.width = 800;
 		config2.height = 600;
@@ -36,7 +36,7 @@ int main() {
 		std::cout << "✓ Ventana 2 creada (ID: " << window2Id << ") - Solo ratón\n";
 
 		// Ventana 3: Todos los eventos
-		pgrender::WindowConfig config3;
+		pgrender::IWindow::Desc config3;
 		config3.title = "Ventana 3 - Todos los Eventos";
 		config3.width = 800;
 		config3.height = 600;

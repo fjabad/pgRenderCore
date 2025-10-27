@@ -21,7 +21,7 @@ protected:
 TEST_F(WindowCreationTest, CreateSingleWindow) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.title = "Test Window";
 	config.width = 800;
 	config.height = 600;
@@ -47,7 +47,7 @@ TEST_F(WindowCreationTest, CreateSingleWindow) {
 TEST_F(WindowCreationTest, CreateMultipleWindows) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 
@@ -74,7 +74,7 @@ TEST_F(WindowCreationTest, CreateMultipleWindows) {
 TEST_F(WindowCreationTest, WindowVisibility) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 
@@ -94,7 +94,7 @@ TEST_F(WindowCreationTest, WindowVisibility) {
 TEST_F(WindowCreationTest, WindowTitleChange) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.title = "Original Title";
 	config.width = 800;
 	config.height = 600;
@@ -112,7 +112,7 @@ TEST_F(WindowCreationTest, WindowTitleChange) {
 TEST_F(WindowCreationTest, WindowResize) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 

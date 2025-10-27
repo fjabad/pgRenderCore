@@ -26,7 +26,7 @@ namespace pgrender::backends::sdl3 {
 		closeAllWindows();
 	}
 
-	WindowID SDL3WindowManager::createWindow(const WindowConfig& config) {
+	WindowID SDL3WindowManager::createWindow(const IWindow::Desc& config) {
 		std::lock_guard<std::mutex> lock(m_impl->mutex);
 
 		auto window = std::make_unique<SDL3Window>(config);

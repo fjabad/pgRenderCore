@@ -10,33 +10,35 @@ namespace pgrender::backends::sdl3 {
 	public:
 		SDL_Window* window = nullptr;
 		SDL_WindowID windowId = 0;
-		WindowConfig config;
+		IWindow::Desc config;
 		bool shouldClose = false;
 
-		explicit Impl(const WindowConfig& cfg) : config(cfg) {
+		explicit Impl(const IWindow::Desc& cfg) : config(cfg) {}
+
+		void doCreateWindow() {
 			SDL_WindowFlags flags = 0;
 
-			if (cfg.renderBackend == RenderBackend::OpenGL4) {
+			if (config.renderBackend == RenderBackend::OpenGL4) {
 				flags |= SDL_WINDOW_OPENGL;
 			}
-			else if (cfg.renderBackend == RenderBackend::Vulkan) {
+			else if (config.renderBackend == RenderBackend::Vulkan) {
 				flags |= SDL_WINDOW_VULKAN;
 			}
-			else if (cfg.renderBackend == RenderBackend::Metal) {
+			else if (config.renderBackend == RenderBackend::Metal) {
 				flags |= SDL_WINDOW_METAL;
 			}
 
-			if (cfg.resizable) flags |= SDL_WINDOW_RESIZABLE;
-			if (cfg.fullscreen) flags |= SDL_WINDOW_FULLSCREEN;
-			if (cfg.highDPI) flags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
-			if (cfg.transparent) flags |= SDL_WINDOW_TRANSPARENT;
-			if (cfg.alwaysOnTop) flags |= SDL_WINDOW_ALWAYS_ON_TOP;
-			if (cfg.borderless) flags |= SDL_WINDOW_BORDERLESS;
+			if (config.resizable) flags |= SDL_WINDOW_RESIZABLE;
+			if (config.fullscreen) flags |= SDL_WINDOW_FULLSCREEN;
+			if (config.highDPI) flags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
+			if (config.transparent) flags |= SDL_WINDOW_TRANSPARENT;
+			if (config.alwaysOnTop) flags |= SDL_WINDOW_ALWAYS_ON_TOP;
+			if (config.borderless) flags |= SDL_WINDOW_BORDERLESS;
 
 			window = SDL_CreateWindow(
-				cfg.title.c_str(),
-				cfg.width,
-				cfg.height,
+				config.title.c_str(),
+				config.width,
+				config.height,
 				flags
 			);
 
@@ -44,7 +46,7 @@ namespace pgrender::backends::sdl3 {
 				throw std::runtime_error(std::string("Failed to create window: ") + SDL_GetError());
 			}
 
-			if (cfg.vsync) {
+			if (config.vsync) {
 				SDL_GL_SetSwapInterval(1);
 			}
 
@@ -59,13 +61,17 @@ namespace pgrender::backends::sdl3 {
 	};
 
 	// Implementación de SDL3Window usando PIMPL
-	SDL3Window::SDL3Window(const WindowConfig& config)
+	SDL3Window::SDL3Window(const IWindow::Desc& config)
 		: m_impl(std::make_unique<Impl>(config)) {
+		m_impl->doCreateWindow();
 	}
 
 	SDL3Window::~SDL3Window() = default;
 
 	void SDL3Window::show() {
+		if (m_impl->window == nullptr) {
+			throw std::runtime_error("Provide at least a graphics context before showing the window");
+		}
 		SDL_ShowWindow(m_impl->window);
 	}
 

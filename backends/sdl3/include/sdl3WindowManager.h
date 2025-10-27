@@ -23,7 +23,7 @@ namespace pgrender::backends::sdl3 {
 		SDL3WindowManager& operator=(SDL3WindowManager&&) = delete;
 
 		// Gestión de ventanas
-		WindowID createWindow(const WindowConfig& config) override;
+		WindowID createWindow(const IWindow::Desc& config) override;
 
 		// Displays
 		int getDisplayCount() const override;

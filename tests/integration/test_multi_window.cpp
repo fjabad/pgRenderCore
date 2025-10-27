@@ -22,7 +22,7 @@ protected:
 TEST_F(MultiWindowTest, CreateAndDestroyMultipleWindows) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 
@@ -54,7 +54,7 @@ TEST_F(MultiWindowTest, CreateAndDestroyMultipleWindows) {
 TEST_F(MultiWindowTest, GetActiveWindows) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 
@@ -81,7 +81,7 @@ TEST_F(MultiWindowTest, GetActiveWindows) {
 TEST_F(MultiWindowTest, IndependentContextsPerWindow) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 	config.renderBackend = pgrender::RenderBackend::OpenGL4;
@@ -116,7 +116,7 @@ TEST_F(MultiWindowTest, IndependentContextsPerWindow) {
 TEST_F(MultiWindowTest, WindowClosureMarking) {
 	auto& windowMgr = app->getWindowManager();
 
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 

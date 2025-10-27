@@ -21,7 +21,7 @@ TEST_F(SharedContextsTest, CreateSharedContext) {
 	auto& windowMgr = app->getWindowManager();
 
 	// Crear ventana principal
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 	config.renderBackend = pgrender::RenderBackend::OpenGL4;
@@ -60,7 +60,7 @@ TEST_F(SharedContextsTest, HeadlessSharedContext) {
 	auto& windowMgr = app->getWindowManager();
 
 	// Crear ventana con contexto
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.width = 800;
 	config.height = 600;
 	config.renderBackend = pgrender::RenderBackend::OpenGL4;

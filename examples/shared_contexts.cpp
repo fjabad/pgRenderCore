@@ -26,7 +26,7 @@ int main() {
         auto app = pgrender::AppFactory::createApp();
         
         // Ventana principal
-        pgrender::WindowConfig mainConfig;
+        pgrender::IWindow::Desc mainConfig;
         mainConfig.title = "PGRenderCore - Contextos Compartidos";
         mainConfig.width = 1280;
         mainConfig.height = 720;

@@ -1,5 +1,6 @@
 #include <gmock/gmock.h>
 #include <pgrender/types.h>
+#include <pgrender/window.h>
 
 using namespace ::testing;
 // ============================================================================
@@ -139,11 +140,11 @@ TEST(DisplayInfoTest, DefaultValues) {
 }
 
 // ============================================================================
-// WindowConfig Tests
+// IWindow::Desc Tests
 // ============================================================================
 
 TEST(WindowConfigTest, DefaultValues) {
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 
 	EXPECT_THAT(config.title, Eq("PGRenderCore Window"));
 	EXPECT_THAT(config.width, Eq(800u));

@@ -16,10 +16,10 @@ namespace pgrender::backends::glfw {
 	class GLFWWindow::Impl {
 	public:
 		NativeGLFWWindow* window = nullptr;
-		WindowConfig m_config;
+		IWindow::Desc m_config;
 		bool m_shouldClose = false;
 
-		explicit Impl(const WindowConfig& config) : m_config(config) {
+		explicit Impl(const IWindow::Desc& config) : m_config(config) {
 			//if (!glfwInit()) {
 			//	throw std::runtime_error("Failed to initialize GLFW");
 			//}
@@ -45,7 +45,7 @@ namespace pgrender::backends::glfw {
 		}
 	};
 
-	GLFWWindow::GLFWWindow(const WindowConfig& config) :
+	GLFWWindow::GLFWWindow(const IWindow::Desc& config) :
 		m_impl(std::make_unique<Impl>(config)) {
 	}
 

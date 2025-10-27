@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
         auto app = pgrender::AppFactory::createApp(backend);
         
         // Crear ventana
-        pgrender::WindowConfig config;
+        pgrender::IWindow::Desc config;
         config.title = "PGRenderCore - Selección de Backend";
         config.width = 1280;
         config.height = 720;

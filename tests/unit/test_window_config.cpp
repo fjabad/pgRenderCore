@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
 #include <pgrender/types.h>
+#include <pgrender/window.h>
 
 TEST(WindowConfigTest, BasicConfiguration) {
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 	config.title = "Test Window";
 	config.width = 1920;
 	config.height = 1080;
@@ -19,7 +20,7 @@ TEST(WindowConfigTest, BasicConfiguration) {
 }
 
 TEST(WindowConfigTest, RenderBackendSelection) {
-	pgrender::WindowConfig config;
+	pgrender::IWindow::Desc config;
 
 	config.renderBackend = pgrender::RenderBackend::OpenGL4;
 	EXPECT_EQ(config.renderBackend, pgrender::RenderBackend::OpenGL4);

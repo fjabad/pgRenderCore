@@ -10,7 +10,7 @@ namespace pgrender::backends::glfw {
 		RenderBackend backend = RenderBackend::Auto;
 		bool ownsWindow = false;
 		IGraphicsContext* shareContext = nullptr;
-		void configure(GLFWwindow* window, const ContextConfig& config);
+		void configure(GLFWwindow* win, const ContextConfig& config);
 		void configureAttributes(const ContextConfig& config) {
 			if (config.backend == RenderBackend::OpenGL4) {
 				glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, config.majorVersion);
@@ -45,16 +45,16 @@ namespace pgrender::backends::glfw {
 		m_impl->configure(nullptr, config);
 	}
 
-	void GLFWGraphicsContext::Impl::configure(GLFWwindow* window, const ContextConfig& config)
+	void GLFWGraphicsContext::Impl::configure(GLFWwindow* win, const ContextConfig& config)
 	{
-		if (window == nullptr) {
+		if (win == nullptr) {
 			glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 			this->window = glfwCreateWindow(1, 1, "", nullptr, nullptr);
 			if (!this->window) throw std::runtime_error("Failed to create headless GLFW context");
 			ownsWindow = true;
 		}
 		else {
-			this->window = window;
+			this->window = win;
 		}
 		configureAttributes(config);
 

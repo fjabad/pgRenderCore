@@ -5,7 +5,7 @@
 #include <PGRenderCore/debugManager.h>
 
 
-namespace PGRenderCore {
+namespace pgrender {
 
     /**
      * @brief Implementación de Device para OpenGL 4.
@@ -22,4 +22,4 @@ namespace PGRenderCore {
 		std::unique_ptr<DebugManager> m_debugManager;
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

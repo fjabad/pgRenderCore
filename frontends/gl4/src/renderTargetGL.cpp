@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <iostream>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     RenderTargetGL::RenderTargetGL(const Desc& desc)
         : m_desc(desc), m_width(desc.width), m_height(desc.height),
@@ -91,4 +91,4 @@ namespace PGRenderCore {
         }
     }
 
-} // namespace PGRenderCore
+} // namespace pgrender

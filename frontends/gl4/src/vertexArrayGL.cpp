@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 #include <stdexcept>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     VertexArrayGL::VertexArrayGL(const VertexArray::Desc& desc)
         : m_vao(0), m_layout(desc.layout),
@@ -209,4 +209,4 @@ namespace PGRenderCore {
         }
     }
 
-} // namespace PGRenderCore
+} // namespace pgrender

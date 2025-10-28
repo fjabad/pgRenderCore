@@ -10,16 +10,29 @@ namespace pgrender::backends::glfw {
 		RenderBackend backend = RenderBackend::Auto;
 		bool ownsWindow = false;
 		IGraphicsContext* shareContext = nullptr;
-		void configure(GLFWwindow* win, const ContextConfig& config);
-		void configureAttributes(const ContextConfig& config) {
-			if (config.backend == RenderBackend::OpenGL4) {
-				glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, config.majorVersion);
-				glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, config.minorVersion);
-				glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		void configure(GLFWwindow* win, const IContextDescriptor& config);
 
-				if (config.debugContext) {
-					glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-				}
+		void configureAttributesGL4(const pgrender::GLContextDescriptor& config) {
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, config.majorVersion);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, config.minorVersion);
+			glfwWindowHint(GLFW_OPENGL_PROFILE,
+				config.profile == pgrender::GLContextDescriptor::Profile::Core
+				? GLFW_OPENGL_CORE_PROFILE
+				: GLFW_OPENGL_COMPAT_PROFILE);
+
+			if (config.debugContext) {
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+			}
+
+			shareContext = static_cast<IGraphicsContext *>(config.shareContext);
+		}
+
+
+		void configureAttributes(const IContextDescriptor& config) {
+			switch (config.getBackend()) {
+			case RenderBackend::OpenGL4:
+				configureAttributesGL4(static_cast<const pgrender::GLContextDescriptor&>(config));
+				break;
 			}
 		}
 
@@ -30,22 +43,22 @@ namespace pgrender::backends::glfw {
 		}
 	};
 
-	GLFWGraphicsContext::GLFWGraphicsContext(void* window, const ContextConfig& config)
+	GLFWGraphicsContext::GLFWGraphicsContext(void* window, const IContextDescriptor& config)
 		: m_impl(std::make_unique<Impl>())
 	{
 		if (!window) {
 			throw std::runtime_error("Invalid window handle for GLFW context creation");
 		}
-		m_impl->configure(static_cast<GLFWwindow *>(window), config);
+		m_impl->configure(static_cast<GLFWwindow*>(window), config);
 	}
 
-	GLFWGraphicsContext::GLFWGraphicsContext(const ContextConfig& config) :
+	GLFWGraphicsContext::GLFWGraphicsContext(const IContextDescriptor& config) :
 		m_impl(std::make_unique<Impl>())
 	{
 		m_impl->configure(nullptr, config);
 	}
 
-	void GLFWGraphicsContext::Impl::configure(GLFWwindow* win, const ContextConfig& config)
+	void GLFWGraphicsContext::Impl::configure(GLFWwindow* win, const IContextDescriptor& config)
 	{
 		if (win == nullptr) {
 			glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -56,15 +69,15 @@ namespace pgrender::backends::glfw {
 		else {
 			this->window = win;
 		}
+		backend = config.getBackend();
+
 		configureAttributes(config);
 
-		backend = config.backend;
-		shareContext = static_cast<IGraphicsContext*>(config.shareContext);
 		glfwMakeContextCurrent(this->window);
 	}
 
 	GLFWGraphicsContext::~GLFWGraphicsContext() = default;
-	
+
 
 	void GLFWGraphicsContext::makeCurrent() {
 		glfwMakeContextCurrent(m_impl->window);

@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     class ShaderGL : public Program {
     public:
@@ -31,5 +31,5 @@ namespace PGRenderCore {
         void detachAndDeleteShaders();
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender
 

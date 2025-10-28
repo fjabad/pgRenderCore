@@ -38,15 +38,8 @@ public:
 	virtual WindowID getWindowID() const = 0;
     
     // Crear contexto gráfico
-    virtual std::unique_ptr<IGraphicsContext> createContext(const ContextConfig& config) = 0;
+    virtual std::unique_ptr<IGraphicsContext> createContext(const IContextDescriptor& config) = 0;
     
-    // Sobrecarga de conveniencia
-    std::unique_ptr<IGraphicsContext> createContext(RenderBackend backend) {
-        ContextConfig config;
-        config.backend = backend;
-        return createContext(config);
-    }
-
 	// Modo relativo de mouse (por ventana en SDL3)
 	virtual void setRelativeMouseMode(bool enabled) = 0;
 	virtual bool getRelativeMouseMode() const = 0;

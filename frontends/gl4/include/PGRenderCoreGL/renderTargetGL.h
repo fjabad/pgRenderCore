@@ -4,7 +4,7 @@
 #include <memory>
 #include <cstdint>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     class TextureGL;
 
@@ -38,5 +38,5 @@ namespace PGRenderCore {
         std::shared_ptr<Texture> m_depthStencilAttachment;
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender
 

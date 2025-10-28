@@ -12,15 +12,69 @@ namespace pgrender::backends::sdl3 {
 		bool ownsWindow = false;
 		IGraphicsContext* shareContext = nullptr;
 
-		void configureAttributes(const ContextConfig& config) {
-			if (config.backend == RenderBackend::OpenGL4) {
-				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, config.majorVersion);
-				SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, config.minorVersion);
-				SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+		void preConfigureAttributesGL4(const pgrender::GLContextDescriptor& config) {
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, config.majorVersion);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, config.minorVersion);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+				config.profile == pgrender::GLContextDescriptor::Profile::Compatibility ?
+				SDL_GL_CONTEXT_PROFILE_COMPATIBILITY :
+				SDL_GL_CONTEXT_PROFILE_CORE);
 
-				if (config.debugContext) {
-					SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
-				}
+			if (config.debugContext) {
+				SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+			}
+		}
+
+		void postConfigureAttributesGL4(const pgrender::GLContextDescriptor& config) {
+			shareContext = static_cast<IGraphicsContext*>(config.shareContext);
+			if (shareContext) {
+				auto* sharedCtx = static_cast<SDL3GraphicsContext*>(config.shareContext);
+				SDL_GLContext shareHandle = static_cast<SDL_GLContext>(sharedCtx->getNativeHandle());
+				SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+				SDL_GL_MakeCurrent(window, shareHandle);
+			}
+
+		}
+
+		void configureAttributes(const IContextDescriptor& config) {
+			switch (config.getBackend())
+			{
+			case RenderBackend::OpenGL4:
+				preConfigureAttributesGL4(static_cast<const pgrender::GLContextDescriptor&>(config));
+				postConfigureAttributesGL4(static_cast<const pgrender::GLContextDescriptor&>(config));
+				break;
+			}
+		}
+
+		void createDummyWindowGL4(const pgrender::GLContextDescriptor& config) {
+
+			preConfigureAttributesGL4(config);
+
+			SDL_WindowFlags flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN;
+
+			window = SDL_CreateWindow("", 1, 1, flags);
+			if (!window) {
+				throw std::runtime_error(std::string("Failed to create headless window: ") + SDL_GetError());
+			}
+			ownsWindow = true;
+
+			if (config.shareContext) {
+				auto* sharedCtx = static_cast<SDL3GraphicsContext*>(config.shareContext);
+				SDL_GLContext shareHandle = static_cast<SDL_GLContext>(sharedCtx->getNativeHandle());
+				SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+
+				SDL_Window* shareWindow = static_cast<SDL_Window*>(sharedCtx->getWindow());
+				SDL_GL_MakeCurrent(shareWindow, shareHandle);
+			}
+
+		}
+
+
+		void createDummyWindow(const IContextDescriptor& config) {
+			switch (config.getBackend()) {
+			case RenderBackend::OpenGL4:
+				createDummyWindowGL4(static_cast<const pgrender::GLContextDescriptor&>(config));
+				break;
 			}
 		}
 
@@ -34,21 +88,14 @@ namespace pgrender::backends::sdl3 {
 		}
 	};
 
-	SDL3GraphicsContext::SDL3GraphicsContext(void* window, const ContextConfig& config)
+	SDL3GraphicsContext::SDL3GraphicsContext(void* window, const IContextDescriptor& config)
 		: m_impl(std::make_unique<Impl>()) {
 
 		m_impl->window = static_cast<SDL_Window*>(window);
-		m_impl->backend = config.backend;
-		m_impl->shareContext = static_cast<IGraphicsContext*>(config.shareContext);
+		m_impl->backend = config.getBackend();
+
 
 		m_impl->configureAttributes(config);
-
-		if (config.shareContext) {
-			auto* sharedCtx = static_cast<SDL3GraphicsContext*>(config.shareContext);
-			SDL_GLContext shareHandle = static_cast<SDL_GLContext>(sharedCtx->getNativeHandle());
-			SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-			SDL_GL_MakeCurrent(m_impl->window, shareHandle);
-		}
 
 		m_impl->context = SDL_GL_CreateContext(m_impl->window);
 		if (!m_impl->context) {
@@ -56,32 +103,32 @@ namespace pgrender::backends::sdl3 {
 		}
 	}
 
-	SDL3GraphicsContext::SDL3GraphicsContext(const ContextConfig& config)
+	SDL3GraphicsContext::SDL3GraphicsContext(const IContextDescriptor& config)
 		: m_impl(std::make_unique<Impl>()) {
 
-		m_impl->backend = config.backend;
-		m_impl->shareContext = static_cast<IGraphicsContext*>(config.shareContext);
-
-		m_impl->configureAttributes(config);
-
-		SDL_WindowFlags flags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN;
-
-		m_impl->window = SDL_CreateWindow("", 1, 1, flags);
-		if (!m_impl->window) {
-			throw std::runtime_error(std::string("Failed to create headless window: ") + SDL_GetError());
+		m_impl->backend = config.getBackend();
+		switch (config.getBackend()) {
+		case RenderBackend::OpenGL4:
+		{
+			auto glConfig = static_cast<const pgrender::GLContextDescriptor&>(config);
+			if (glConfig.shareContext) {
+				// if the new context is going to share another context, use the other context window
+				m_impl->window = static_cast<SDL3GraphicsContext*>(glConfig.shareContext)->m_impl->window;
+				m_impl->configureAttributes(config);
+			}
+			else {
+				// create a dummy window
+				m_impl->preConfigureAttributesGL4(glConfig);
+				m_impl->createDummyWindow(config);
+				m_impl->postConfigureAttributesGL4(glConfig);
+			}
 		}
-
-		if (config.shareContext) {
-			auto* sharedCtx = static_cast<SDL3GraphicsContext*>(config.shareContext);
-			SDL_GLContext shareHandle = static_cast<SDL_GLContext>(sharedCtx->getNativeHandle());
-			SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-
-			SDL_Window* shareWindow = static_cast<SDL_Window*>(sharedCtx->getWindow());
-			SDL_GL_MakeCurrent(shareWindow, shareHandle);
+		break;
+		default:
+			m_impl->configureAttributes(config);
 		}
 
 		m_impl->context = SDL_GL_CreateContext(m_impl->window);
-		m_impl->ownsWindow = true;
 
 		if (!m_impl->context) {
 			throw std::runtime_error(std::string("Failed to create headless context: ") + SDL_GetError());

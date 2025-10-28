@@ -24,7 +24,7 @@
 #include <OpenGL/gl3.h>
 #endif
 
-namespace PGRenderCore {
+namespace pgrender {
 
 	// ===== CONSTRUCTOR Y DESTRUCTOR =====
 
@@ -715,4 +715,4 @@ namespace PGRenderCore {
 		glPolygonMode(GL_FRONT_AND_BACK, toGLMode(mode));
 	}
 
-} // namespace PGRenderCore
+} // namespace pgrender

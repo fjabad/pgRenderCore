@@ -20,7 +20,7 @@ namespace pgrender::backends::sdl3 {
 		SDL3App(SDL3App&&) = delete;
 		SDL3App& operator=(SDL3App&&) = delete;
 
-		std::unique_ptr<IGraphicsContext> createHeadlessContext(const ContextConfig& config) override;
+		std::unique_ptr<IGraphicsContext> createHeadlessContext(const IContextDescriptor& config) override;
 
 		IWindowManager& getWindowManager() override;
 		IInputSystem& getInputSystem() override;

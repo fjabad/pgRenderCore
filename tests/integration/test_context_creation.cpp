@@ -29,8 +29,7 @@ TEST_F(ContextCreationTest, CreateWindowContext) {
 	auto* window = windowMgr.getWindow(windowId);
 	ASSERT_NE(window, nullptr);
 
-	pgrender::ContextConfig ctxConfig;
-	ctxConfig.backend = pgrender::RenderBackend::OpenGL4;
+	pgrender::GLContextDescriptor ctxConfig;
 
 	auto gfxContext = window->createContext(ctxConfig);
 	ASSERT_NE(gfxContext, nullptr);
@@ -48,8 +47,7 @@ TEST_F(ContextCreationTest, CreateWindowContext) {
 }
 
 TEST_F(ContextCreationTest, CreateHeadlessContext) {
-	pgrender::ContextConfig config;
-	config.backend = pgrender::RenderBackend::OpenGL4;
+	pgrender::GLContextDescriptor config;
 
 	auto headlessContext = app->createHeadlessContext(config);
 
@@ -69,7 +67,8 @@ TEST_F(ContextCreationTest, MakeContextCurrent) {
 	auto windowId = windowMgr.createWindow(config);
 	auto* window = windowMgr.getWindow(windowId);
 
-	auto gfxContext = window->createContext(pgrender::RenderBackend::OpenGL4);
+	pgrender::GLContextDescriptor ctxConfig;
+	auto gfxContext = window->createContext(ctxConfig);
 	ASSERT_NE(gfxContext, nullptr);
 
 	EXPECT_NO_THROW(gfxContext->makeCurrent());

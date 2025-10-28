@@ -11,8 +11,13 @@ namespace pgrender::backends::sdl3 {
 
 	class SDL3GraphicsContext : public IGraphicsContext {
 	public:
-		SDL3GraphicsContext(void* window, const ContextConfig& config);
-		explicit SDL3GraphicsContext(const ContextConfig& config);
+
+		SDL3GraphicsContext(void* window, const IContextDescriptor& config);
+		/**
+		 * @brief Create a window-less context
+		 * @param config 
+		 */
+		explicit SDL3GraphicsContext(const IContextDescriptor& config);
 		~SDL3GraphicsContext() override;
 
 		// Deshabilitar copia y movimiento

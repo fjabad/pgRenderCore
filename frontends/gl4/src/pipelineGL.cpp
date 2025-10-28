@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <iostream>
 
-namespace PGRenderCore {
+namespace pgrender {
 
 	PipelineGL::PipelineGL(const Pipeline::Desc& desc)
 		: m_desc(desc)
@@ -128,5 +128,5 @@ namespace PGRenderCore {
 		}
 	}
 
-} // namespace PGRenderCore
+} // namespace pgrender
 

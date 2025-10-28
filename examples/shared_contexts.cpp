@@ -38,8 +38,7 @@ int main() {
 		auto* mainWindow = windowManager.getWindow(mainWindowID);
         
         // Contexto principal
-        pgrender::ContextConfig mainCtxConfig;
-        mainCtxConfig.backend = pgrender::RenderBackend::OpenGL4;
+		pgrender::GLContextDescriptor mainCtxConfig;
         mainCtxConfig.debugContext = true;
         
         auto mainContext = mainWindow->createContext(mainCtxConfig);
@@ -48,8 +47,7 @@ int main() {
         std::cout << "Contexto principal creado\n";
         
         // Contexto compartido para carga en segundo plano
-        pgrender::ContextConfig sharedConfig;
-        sharedConfig.backend = pgrender::RenderBackend::OpenGL4;
+		pgrender::GLContextDescriptor  sharedConfig;
         sharedConfig.shareContext = mainContext.get();
         
         auto uploadContext = app->createHeadlessContext(sharedConfig);

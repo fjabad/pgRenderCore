@@ -32,14 +32,13 @@ TEST(WindowConfigTest, RenderBackendSelection) {
 	EXPECT_EQ(config.renderBackend, pgrender::RenderBackend::Metal);
 }
 
-TEST(ContextConfigTest, OpenGLConfiguration) {
-	pgrender::ContextConfig config;
-	config.backend = pgrender::RenderBackend::OpenGL4;
+TEST(IContextDescriptorTest, OpenGLConfiguration) {
+	pgrender::GLContextDescriptor config;
 	config.majorVersion = 4;
 	config.minorVersion = 6;
 	config.debugContext = true;
 
-	EXPECT_EQ(config.backend, pgrender::RenderBackend::OpenGL4);
+	EXPECT_EQ(config.getBackend(), pgrender::RenderBackend::OpenGL4);
 	EXPECT_EQ(config.majorVersion, 4);
 	EXPECT_EQ(config.minorVersion, 6);
 	EXPECT_TRUE(config.debugContext);

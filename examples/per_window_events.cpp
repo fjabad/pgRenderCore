@@ -52,8 +52,7 @@ int main() {
 
 		// Crear contextos para todas las ventanas
 		for (auto wid : { window1Id, window2Id, window3Id }) {
-			pgrender::ContextConfig ctxConfig;
-			ctxConfig.backend = pgrender::RenderBackend::OpenGL4;
+			pgrender::GLContextDescriptor ctxConfig;
 
 			auto* window = windowMgr.getWindow(wid);
 			auto context = window->createContext(ctxConfig);

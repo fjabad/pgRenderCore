@@ -67,8 +67,13 @@ namespace pgrender {
 	};
 
 	// Configuración de contexto gráfico
-	struct ContextConfig {
-		RenderBackend backend = RenderBackend::Auto;
+	struct IContextDescriptor {
+		virtual ~IContextDescriptor() = default;
+		virtual RenderBackend getBackend() const = 0;
+	};
+
+	struct GLContextDescriptor : public IContextDescriptor {
+		RenderBackend getBackend() const override { return RenderBackend::OpenGL4; }
 		void* shareContext = nullptr;  // IGraphicsContext* para compartir recursos
 		bool debugContext = false;
 		int majorVersion = 4;
@@ -79,7 +84,13 @@ namespace pgrender {
 #else
 		int minorVersion = 6;
 #endif
+		enum class Profile {
+			Core,
+			Compatibility
+		} profile = Profile::Core;
 	};
+
+
 
 	// Evento genérico
 	struct Event {

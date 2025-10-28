@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
         
         auto windowID = wm.createWindow(config);
 		auto window = wm.getWindow(windowID);
-        auto graphicsContext = window->createContext(pgrender::RenderBackend::OpenGL4);
+		auto graphicsContext = window->createContext(pgrender::GLContextDescriptor{});
         graphicsContext->makeCurrent();
         
         std::cout << "Ventana creada exitosamente\n";

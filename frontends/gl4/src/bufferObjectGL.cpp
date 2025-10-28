@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <cstring>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     BufferObjectGL::BufferObjectGL(const BufferObject::Desc& desc)
         : m_desc(desc), m_bufferId(0), m_size(desc.size), m_isMapped(false)
@@ -206,4 +206,4 @@ namespace PGRenderCore {
         return glFlags;
     }
 
-} // namespace PGRenderCore
+} // namespace pgrender

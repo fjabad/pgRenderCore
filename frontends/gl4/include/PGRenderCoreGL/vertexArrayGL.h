@@ -2,7 +2,7 @@
 #include <PGRenderCore/vertexArray.h>
 #include <cstdint>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     class VertexArrayGL : public VertexArray {
     public:
@@ -32,4 +32,4 @@ namespace PGRenderCore {
         unsigned int toGLAttributeType(VertexAttributeType type) const;
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

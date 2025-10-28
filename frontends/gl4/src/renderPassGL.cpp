@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <PGRenderCoreGL/renderTargetGL.h>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     RenderPassGL::RenderPassGL(const RenderPass::Desc& desc)
         : m_desc(desc), m_isActive(false)
@@ -78,4 +78,4 @@ namespace PGRenderCore {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-} // namespace PGRenderCore
+} // namespace pgrender

@@ -2,7 +2,7 @@
 #include <PGRenderCore/bufferObject.h>
 #include <cstdint>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     using BufferHandle = uint32_t;
 
@@ -40,4 +40,4 @@ namespace PGRenderCore {
         unsigned int toGLAccessFlags(BufferAccessFlags flags) const;
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

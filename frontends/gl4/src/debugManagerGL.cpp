@@ -4,7 +4,7 @@
 #include <sstream>
 #include <iomanip>
 
-namespace PGRenderCore {
+namespace pgrender {
 
 	DebugManagerGL::DebugManagerGL()
 		: m_callback(defaultCallback)
@@ -421,4 +421,4 @@ namespace PGRenderCore {
 #endif
 	}
 
-} // namespace PGRenderCore
+} // namespace pgrender

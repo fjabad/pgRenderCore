@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <cstring>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     TextureGL::TextureGL(const Desc& desc)
         : m_desc(desc), m_textureId(0)
@@ -146,4 +146,4 @@ namespace PGRenderCore {
         }
     }
 
-} // namespace PGRenderCore
+} // namespace pgrender

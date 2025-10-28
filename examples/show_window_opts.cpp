@@ -33,8 +33,7 @@ int main() {
 		}
 
 		// Crear y asociar contexto gráfico
-		pgrender::ContextConfig ctxConfig;
-		ctxConfig.backend = pgrender::RenderBackend::OpenGL4;
+		pgrender::GLContextDescriptor ctxConfig;
 		ctxConfig.majorVersion = 4;
 		ctxConfig.minorVersion = 6;
 		ctxConfig.debugContext = true;

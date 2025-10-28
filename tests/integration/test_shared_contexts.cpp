@@ -30,7 +30,7 @@ TEST_F(SharedContextsTest, CreateSharedContext) {
 	auto* window1 = windowMgr.getWindow(window1Id);
 
 	// Crear contexto principal
-	auto context1 = window1->createContext(pgrender::RenderBackend::OpenGL4);
+	auto context1 = window1->createContext(pgrender::GLContextDescriptor{});
 	ASSERT_NE(context1, nullptr);
 
 	windowMgr.setWindowContext(window1Id, std::move(context1));
@@ -40,8 +40,7 @@ TEST_F(SharedContextsTest, CreateSharedContext) {
 	auto* window2 = windowMgr.getWindow(window2Id);
 
 	// Crear contexto compartido
-	pgrender::ContextConfig sharedConfig;
-	sharedConfig.backend = pgrender::RenderBackend::OpenGL4;
+	pgrender::GLContextDescriptor sharedConfig;
 	sharedConfig.shareContext = windowMgr.getWindowContext(window1Id);
 
 	auto context2 = window2->createContext(sharedConfig);
@@ -68,12 +67,11 @@ TEST_F(SharedContextsTest, HeadlessSharedContext) {
 	auto windowId = windowMgr.createWindow(config);
 	auto* window = windowMgr.getWindow(windowId);
 
-	auto mainContext = window->createContext(pgrender::RenderBackend::OpenGL4);
+	auto mainContext = window->createContext(pgrender::GLContextDescriptor{});
 	windowMgr.setWindowContext(windowId, std::move(mainContext));
 
 	// Crear contexto headless compartido
-	pgrender::ContextConfig headlessConfig;
-	headlessConfig.backend = pgrender::RenderBackend::OpenGL4;
+	pgrender::GLContextDescriptor headlessConfig;
 	headlessConfig.shareContext = windowMgr.getWindowContext(windowId);
 
 	auto headlessContext = app->createHeadlessContext(headlessConfig);

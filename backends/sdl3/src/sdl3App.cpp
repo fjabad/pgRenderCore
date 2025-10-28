@@ -37,7 +37,7 @@ namespace pgrender::backends::sdl3 {
 
 	SDL3App::~SDL3App() = default;
 
-	std::unique_ptr<IGraphicsContext> SDL3App::createHeadlessContext(const ContextConfig& config) {
+	std::unique_ptr<IGraphicsContext> SDL3App::createHeadlessContext(const IContextDescriptor& config) {
 		return std::make_unique<SDL3GraphicsContext>(config);
 	}
 

@@ -2,7 +2,7 @@
 #include <GL/glew.h>  // Solo aquí
 #include <stdexcept>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     SamplerGL::SamplerGL(const Desc& desc)
         : m_desc(desc), m_samplerId(0)
@@ -66,4 +66,4 @@ namespace PGRenderCore {
         }
     }
 
-} // namespace PGRenderCore
+} // namespace pgrender

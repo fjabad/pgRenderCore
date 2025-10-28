@@ -21,7 +21,7 @@ namespace pgrender::backends::glfw{
 
 	GLFWApp::~GLFWApp() = default;
 
-	std::unique_ptr<IGraphicsContext> GLFWApp::createHeadlessContext(const ContextConfig& config) {
+	std::unique_ptr<IGraphicsContext> GLFWApp::createHeadlessContext(const IContextDescriptor& config) {
 		return std::make_unique<GLFWGraphicsContext>(config);
 	}
 

@@ -23,7 +23,7 @@ protected:
 		config.title = "InputSystemTest";
 		windowID = windowManager.createWindow(config);
 		window = static_cast<pgrender::backends::glfw::GLFWWindow*>(windowManager.getWindow(windowID));
-		auto ctx = window->createContext(pgrender::ContextConfig{});
+		auto ctx = window->createContext(pgrender::GLContextDescriptor{});
 		ctx->makeCurrent();
 #elif PGRENDER_USE_SDL3
 		app = pgrender::AppFactory::createApp(pgrender::WindowBackend::SDL3);

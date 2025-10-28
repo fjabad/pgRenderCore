@@ -16,7 +16,7 @@ namespace pgrender::backends::glfw {
 		GLFWApp(GLFWApp&&) = delete;
 		GLFWApp& operator=(GLFWApp&&) = delete;
 
-		std::unique_ptr<IGraphicsContext> createHeadlessContext(const ContextConfig& config) override;
+		std::unique_ptr<IGraphicsContext> createHeadlessContext(const IContextDescriptor& config) override;
 		IWindowManager& getWindowManager() override;
 		IInputSystem& getInputSystem() override;
 

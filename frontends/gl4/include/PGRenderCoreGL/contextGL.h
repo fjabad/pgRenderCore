@@ -1,9 +1,11 @@
 #pragma once
+#include <pgrender/types.h>
+
 #include <PGRenderCore/Context.h>
 #include <unordered_map>
 #include <cstdint>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     /**
      * @brief Implementación OpenGL del contexto de renderizado.
@@ -133,4 +135,4 @@ namespace PGRenderCore {
         void cleanupGLContext();
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

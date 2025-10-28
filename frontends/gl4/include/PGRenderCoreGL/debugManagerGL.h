@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <PGRenderCore/debugManager.h>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     /**
      * @brief Gestor de debug para OpenGL.
@@ -124,4 +124,4 @@ namespace PGRenderCore {
 
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

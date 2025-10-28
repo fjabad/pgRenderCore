@@ -3,7 +3,7 @@
 #include <vector>
 #include <stdexcept>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     ShaderGL::ShaderGL(const Program::Desc& desc)
         : m_desc(desc), m_programId(0), m_lastError()
@@ -152,4 +152,4 @@ namespace PGRenderCore {
         }
     }
 
-} // namespace PGRenderCore
+} // namespace pgrender

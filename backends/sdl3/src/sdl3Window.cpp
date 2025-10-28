@@ -98,7 +98,7 @@ namespace pgrender::backends::sdl3 {
 		return m_impl->window;
 	}
 
-	std::unique_ptr<IGraphicsContext> SDL3Window::createContext(const ContextConfig& config) {
+	std::unique_ptr<IGraphicsContext> SDL3Window::createContext(const IContextDescriptor& config) {
 		return std::make_unique<SDL3GraphicsContext>(m_impl->window, config);
 	}
 

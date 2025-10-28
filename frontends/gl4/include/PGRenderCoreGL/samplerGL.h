@@ -2,7 +2,7 @@
 #include <PGRenderCore/sampler.h>
 #include <cstdint>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     // Alias opaco para identificador OpenGL de sampler
     using SamplerHandle = uint32_t;
@@ -25,5 +25,5 @@ namespace PGRenderCore {
         unsigned int toGLFilterMode(FilterMode mode) const;
         unsigned int toGLAddressMode(AddressMode mode) const;
     };
-} // namespace PGRenderCore
+} // namespace pgrender
 

@@ -11,8 +11,8 @@ namespace pgrender::backends::glfw {
 
     class GLFWGraphicsContext : public IGraphicsContext {
     public:
-        explicit GLFWGraphicsContext(void* window, const ContextConfig& config);
-        explicit GLFWGraphicsContext(const ContextConfig& config);
+        explicit GLFWGraphicsContext(void* window, const IContextDescriptor& config);
+        explicit GLFWGraphicsContext(const IContextDescriptor& config);
         ~GLFWGraphicsContext() override;
 
 		// Deshabilitar copia y movimiento

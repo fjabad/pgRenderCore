@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-namespace PGRenderCore {
+namespace pgrender {
     class PipelineGL : public Pipeline {
     public:
         explicit PipelineGL(const Pipeline::Desc& desc);
@@ -29,4 +29,4 @@ namespace PGRenderCore {
         unsigned int toGLBlendOp(BlendOp op) const;
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

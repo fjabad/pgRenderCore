@@ -79,7 +79,7 @@ namespace pgrender::backends::glfw {
 		return m_impl->window;
 	}
 
-	std::unique_ptr<IGraphicsContext> GLFWWindow::createContext(const ContextConfig& config) {
+	std::unique_ptr<IGraphicsContext> GLFWWindow::createContext(const IContextDescriptor& config) {
 		auto ctx = std::make_unique<GLFWGraphicsContext>(m_impl->window, config);
 		glfwSwapInterval(this->m_impl->m_config.vsync ? 1 : 0);
 		return ctx;

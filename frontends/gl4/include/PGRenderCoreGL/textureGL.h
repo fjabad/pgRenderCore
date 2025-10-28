@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <PGRenderCore/backendType.h>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     // Alias opaco para el identificador de textura OpenGL
     using TextureHandle = uint32_t;
@@ -32,4 +32,4 @@ namespace PGRenderCore {
         unsigned int toGLType() const;
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

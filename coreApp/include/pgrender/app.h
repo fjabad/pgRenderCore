@@ -4,7 +4,7 @@
 
 namespace pgrender {
 	class IGraphicsContext;
-	struct ContextConfig;
+	struct IContextDescriptor;
 	class IWindowManager;
 	class IInputSystem;
 	/// Contexto de aplicación
@@ -15,14 +15,7 @@ namespace pgrender {
 		/// Crea un contexto gráfico sin ventana (headless)
 		/// @param config Configuración del contexto
 		/// @return Contexto gráfico headless
-		virtual std::unique_ptr<IGraphicsContext> createHeadlessContext(const ContextConfig& config) = 0;
-
-		/// Sobrecarga de conveniencia para crear contexto headless
-		std::unique_ptr<IGraphicsContext> createHeadlessContext(RenderBackend backend) {
-			ContextConfig config;
-			config.backend = backend;
-			return createHeadlessContext(config);
-		}
+		virtual std::unique_ptr<IGraphicsContext> createHeadlessContext(const IContextDescriptor& config) = 0;
 
 		/// Obtiene el gestor de ventanas
 		/// @return Referencia al gestor de ventanas

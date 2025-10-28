@@ -25,7 +25,7 @@ int main() {
 		auto* window = windowManager.getWindow(windowID);
 
         // Crear contexto gráfico
-        auto graphicsContext = window->createContext(pgrender::RenderBackend::OpenGL4);
+		auto graphicsContext = window->createContext(pgrender::GLContextDescriptor{});
         graphicsContext->makeCurrent();
         
         std::cout << "Ventana creada exitosamente\n";

@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <PGRenderCore/backendType.h>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     class RenderPassGL : public RenderPass {
     public:
@@ -23,4 +23,4 @@ namespace PGRenderCore {
         bool m_isActive = false;
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

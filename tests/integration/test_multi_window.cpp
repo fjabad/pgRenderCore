@@ -93,8 +93,8 @@ TEST_F(MultiWindowTest, IndependentContextsPerWindow) {
 	auto* window1 = windowMgr.getWindow(win1);
 	auto* window2 = windowMgr.getWindow(win2);
 
-	auto ctx1 = window1->createContext(pgrender::RenderBackend::OpenGL4);
-	auto ctx2 = window2->createContext(pgrender::RenderBackend::OpenGL4);
+	auto ctx1 = window1->createContext(pgrender::GLContextDescriptor{});
+	auto ctx2 = window2->createContext(pgrender::GLContextDescriptor{});
 
 	ASSERT_NE(ctx1, nullptr);
 	ASSERT_NE(ctx2, nullptr);

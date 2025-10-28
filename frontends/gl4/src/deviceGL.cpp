@@ -4,7 +4,7 @@
 #include "PGRenderCoreGL/contextGL.h"
 #include "PGRenderCoreGL/debugManagerGL.h"
 
-namespace PGRenderCore {
+namespace pgrender {
 
 	DeviceGL::DeviceGL() {
 	}
@@ -31,4 +31,4 @@ namespace PGRenderCore {
 		return m_debugManager.get();
 	}
 
-} // namespace PGRenderCore
+} // namespace pgrender

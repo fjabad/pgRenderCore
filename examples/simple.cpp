@@ -18,7 +18,7 @@ int main() {
 		auto window1 = windowMgr.createWindow(config);
 		//auto window2 = windowMgr.createWindow(config);
 
-		pgrender::ContextConfig ctxConfig;
+		pgrender::GLContextDescriptor ctxConfig;
 
 
 		// Loop principal

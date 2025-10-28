@@ -42,8 +42,7 @@ int main() {
 		std::cout << "✓ Ventana 1 creada (ID: " << window1Id << ")\n";
 
 		// Crear contexto para ventana principal
-		pgrender::ContextConfig ctxConfig1;
-		ctxConfig1.backend = pgrender::RenderBackend::OpenGL4;
+		pgrender::GLContextDescriptor  ctxConfig1;
 		ctxConfig1.majorVersion = 4;
 		ctxConfig1.minorVersion = 6;
 		ctxConfig1.debugContext = false;
@@ -68,8 +67,7 @@ int main() {
 		std::cout << "✓ Ventana 2 creada (ID: " << window2Id << ") [Contexto compartido]\n";
 
 		// Crear contexto compartido
-		pgrender::ContextConfig ctxConfig2;
-		ctxConfig2.backend = pgrender::RenderBackend::OpenGL4;
+		pgrender::GLContextDescriptor  ctxConfig2;
 		ctxConfig2.shareContext = windowMgr.getWindowContext(window1Id);
 
 		auto* window2 = windowMgr.getWindow(window2Id);
@@ -95,7 +93,7 @@ int main() {
 
 			// Crear contexto independiente
 			auto* window3 = windowMgr.getWindow(window3Id);
-			auto context3 = window3->createContext(pgrender::RenderBackend::OpenGL4);
+			auto context3 = window3->createContext(pgrender::GLContextDescriptor{});
 			windowMgr.setWindowContext(window3Id, std::move(context3));
 
 			// Centrar en el segundo display

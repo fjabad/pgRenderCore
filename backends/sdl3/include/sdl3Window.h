@@ -19,7 +19,7 @@ namespace pgrender::backends::sdl3 {
 		void getSize(uint32_t& width, uint32_t& height) const override;
 		void* getNativeHandle() const override;
 
-		std::unique_ptr<IGraphicsContext> createContext(const ContextConfig& config) override;
+		std::unique_ptr<IGraphicsContext> createContext(const IContextDescriptor& config) override;
 
 
 		void setRelativeMouseMode(bool enabled) override;

@@ -4,7 +4,7 @@
 
 #include "core.h"
 
-namespace PGRenderCore {
+namespace pgrender {
 
     /**
      * @brief Enum que representa las etapas (stages) de shader soportadas,
@@ -76,4 +76,4 @@ namespace PGRenderCore {
 
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

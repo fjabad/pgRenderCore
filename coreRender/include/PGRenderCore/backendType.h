@@ -1,6 +1,6 @@
 #pragma once
 
-namespace PGRenderCore {
+namespace pgrender {
 
 	enum class BackendType {
 		OpenGL,
@@ -9,4 +9,4 @@ namespace PGRenderCore {
 		Metal
 	};
 
-} // namespace PGRenderCore	
+} // namespace pgrender	

@@ -1,7 +1,7 @@
 #include "PGRenderCore/vertexLayout.h"
 #include <stdexcept>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     void VertexLayout::addAttribute(const VertexAttribute& attribute) {
         m_attributes.push_back(attribute);
@@ -108,4 +108,4 @@ namespace PGRenderCore {
         return m_layout;
     }
 
-} // namespace PGRenderCore
+} // namespace pgrender

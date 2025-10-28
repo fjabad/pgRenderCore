@@ -6,7 +6,7 @@
 #include <vector>
 #include <cstdint>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     /**
      * @brief Vertex Array Object: encapsula layout + buffers.
@@ -64,4 +64,4 @@ namespace PGRenderCore {
 
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

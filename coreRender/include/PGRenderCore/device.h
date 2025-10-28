@@ -3,7 +3,7 @@
 #include "PGRenderCore/context.h"
 #include <memory>
 
-namespace PGRenderCore {
+namespace pgrender {
     class DebugManager;
     class Device {
     public:

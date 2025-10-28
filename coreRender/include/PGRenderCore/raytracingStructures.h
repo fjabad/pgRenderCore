@@ -5,7 +5,7 @@
 #include <vector>
 #include <cstdint>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     /**
      * @brief Tipo de geometría para ray tracing.
@@ -138,4 +138,4 @@ namespace PGRenderCore {
         CAST_HELPERS;
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

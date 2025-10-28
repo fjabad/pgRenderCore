@@ -1,6 +1,6 @@
 #pragma once
 
-namespace PGRenderCore {
+namespace pgrender {
 
 
     /**
@@ -77,4 +77,4 @@ namespace PGRenderCore {
         Point           // Sólo vértices
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

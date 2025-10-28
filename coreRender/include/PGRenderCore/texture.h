@@ -2,7 +2,7 @@
 #include <cstdint>
 #include "core.h"
 
-namespace PGRenderCore {
+namespace pgrender {
 
     /**
      * @brief Clase que representa una textura en GPU.
@@ -90,4 +90,4 @@ namespace PGRenderCore {
         CAST_HELPERS
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

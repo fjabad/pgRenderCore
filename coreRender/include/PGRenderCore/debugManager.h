@@ -2,7 +2,7 @@
 
 #include <string>
 #include <functional>
-namespace PGRenderCore {
+namespace pgrender {
 
     /**
      * @brief Severidad de mensaje de debug.

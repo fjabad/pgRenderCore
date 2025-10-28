@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     /**
      * @brief Tipos de datos de atributos de vértice.
@@ -134,4 +134,4 @@ namespace PGRenderCore {
         VertexLayout m_layout;
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

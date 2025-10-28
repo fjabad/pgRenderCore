@@ -6,7 +6,7 @@
 
 #include "core.h"
 
-namespace PGRenderCore {
+namespace pgrender {
 
     class RenderTarget;
 
@@ -60,4 +60,4 @@ namespace PGRenderCore {
         CAST_HELPERS
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

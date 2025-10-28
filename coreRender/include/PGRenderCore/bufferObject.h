@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <memory>
 
-namespace PGRenderCore {
+namespace pgrender {
 
     /**
      * @brief Tipo de buffer.
@@ -127,4 +127,4 @@ namespace PGRenderCore {
         CAST_HELPERS
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

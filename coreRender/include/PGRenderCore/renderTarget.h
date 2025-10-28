@@ -5,7 +5,7 @@
 #include <cstdint>
 #include "core.h"
 
-namespace PGRenderCore {
+namespace pgrender {
 
     class Texture;
 
@@ -78,4 +78,4 @@ namespace PGRenderCore {
         CAST_HELPERS
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

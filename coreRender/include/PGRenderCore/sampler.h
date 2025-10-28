@@ -3,7 +3,7 @@
 #include "core.h"
 #pragma once
 
-namespace PGRenderCore {
+namespace pgrender {
 
     /**
      * @brief Clase que representa un sampler, que define cómo se muestrea
@@ -63,4 +63,4 @@ namespace PGRenderCore {
 
     };
 
-} // namespace PGRenderCore
+} // namespace pgrender

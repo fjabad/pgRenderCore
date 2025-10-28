@@ -17,7 +17,7 @@
 #include <glm/vec4.hpp>
 
 
-namespace PGRenderCore {
+namespace pgrender {
 
 	/**
 	 * @brief Flags para especificar qué buffers limpiar.
@@ -208,4 +208,4 @@ namespace PGRenderCore {
 		CAST_HELPERS
 	};
 
-} // namespace PGRenderCore
+} // namespace pgrender

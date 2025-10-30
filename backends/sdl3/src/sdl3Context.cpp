@@ -20,7 +20,7 @@ namespace pgrender::backends::sdl3 {
 				SDL_GL_CONTEXT_PROFILE_COMPATIBILITY :
 				SDL_GL_CONTEXT_PROFILE_CORE);
 
-			if (config.debugContext) {
+			if (config.enableDebug) {
 				SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 			}
 		}

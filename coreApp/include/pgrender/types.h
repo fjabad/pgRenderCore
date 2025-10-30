@@ -11,8 +11,8 @@ namespace pgrender {
 		Vulkan,       ///< Vulkan API
 		Metal,        ///< Metal (macOS/iOS)
 		DirectX12,    ///< DirectX 12
-		WebGPU,       ///< WebGPU
-		Auto          ///< Selección automática según plataforma
+		WebGPU,        ///< WebGPU
+		Auto = OpenGL4
 	};
 
 	// Backend de ventanas
@@ -70,12 +70,14 @@ namespace pgrender {
 	struct IContextDescriptor {
 		virtual ~IContextDescriptor() = default;
 		virtual RenderBackend getBackend() const = 0;
+
+		bool enableDebug = false;                   ///< Habilitar validación/debug
+		bool enableVSync = true;                    ///< Habilitar sincronización vertical
 	};
 
 	struct GLContextDescriptor : public IContextDescriptor {
 		RenderBackend getBackend() const override { return RenderBackend::OpenGL4; }
 		void* shareContext = nullptr;  // IGraphicsContext* para compartir recursos
-		bool debugContext = false;
 		int majorVersion = 4;
 #ifdef __APPLE__
 		int minorVersion = 1; // macOS soporta hasta OpenGL 4.1

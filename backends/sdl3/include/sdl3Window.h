@@ -1,14 +1,14 @@
 #pragma once
 #include "pgrender/window.h"
 
-// Forward declarations - NO incluir SDL3
 struct SDL_Window;
+struct IGraphicsDescriptor;
 
 namespace pgrender::backends::sdl3 {
 
 	class SDL3Window : public IWindow {
 	public:
-		explicit SDL3Window(const IWindow::Desc& config);
+		explicit SDL3Window(const IWindow::Desc& config, const IGraphicsDescriptor *ctxConfig = nullptr);
 		~SDL3Window() override;
 
 		// IWindow interface
@@ -19,7 +19,7 @@ namespace pgrender::backends::sdl3 {
 		void getSize(uint32_t& width, uint32_t& height) const override;
 		void* getNativeHandle() const override;
 
-		std::unique_ptr<IGraphicsContext> createContext(const IContextDescriptor& config) override;
+		std::unique_ptr<IGraphicsContext> createExtraContext(const IContextDescriptor& config) override;
 
 
 		void setRelativeMouseMode(bool enabled) override;

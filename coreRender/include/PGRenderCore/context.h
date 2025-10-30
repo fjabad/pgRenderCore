@@ -51,20 +51,19 @@ namespace pgrender {
 	class Context {
 	public:
 
-		/**
-		 * @brief Descriptor para crear un contexto de renderizado.
-		 */
-		struct Desc {
-			void* nativeWindowHandle = nullptr;         ///< Handle nativo de ventana (platform-specific)
-			void* nativeDisplayHandle = nullptr;        ///< Handle nativo de display (X11, Wayland)
-			std::shared_ptr<Context> sharedContext = nullptr; ///< Contexto para compartir recursos
+		///**
+		// * @brief Descriptor para crear un contexto de renderizado.
+		// */
+		//struct Desc {
+		//	void* nativeWindowHandle = nullptr;         ///< Handle nativo de ventana (platform-specific)
+		//	void* nativeDisplayHandle = nullptr;        ///< Handle nativo de display (X11, Wayland)
+		//	std::shared_ptr<Context> sharedContext = nullptr; ///< Contexto para compartir recursos
 
-			uint32_t width = 0;                         ///< Ancho de la superficie (opcional)
-			uint32_t height = 0;                        ///< Alto de la superficie (opcional)
+		//	uint32_t width = 0;                         ///< Ancho de la superficie (opcional)
+		//	uint32_t height = 0;                        ///< Alto de la superficie (opcional)
 
-			bool enableDebug = false;                   ///< Habilitar validación/debug
-			bool enableVSync = true;                    ///< Habilitar sincronización vertical
-		};
+
+		//};
 
 
 

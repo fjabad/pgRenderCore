@@ -12,26 +12,15 @@
 #include <iostream>
 #include <cstring>
 
-// Platform-specific includes
-#ifdef _WIN32
-#include <windows.h>
-#include <GL/wglew.h>
-#elif defined(__linux__)
-#include <GL/glx.h>
-#include <X11/Xlib.h>
-#elif defined(__APPLE__)
-#include <OpenGL/OpenGL.h>
-#include <OpenGL/gl3.h>
-#endif
+#include <pgrender/graphicsContext.h>
 
 namespace pgrender {
 
 	// ===== CONSTRUCTOR Y DESTRUCTOR =====
 
-	ContextGL::ContextGL(const Context::Desc& desc)
-		: m_nativeWindowHandle(desc.nativeWindowHandle),
-		m_nativeDisplayHandle(desc.nativeDisplayHandle),
-		m_glContext(nullptr),
+	ContextGL::ContextGL(IGraphicsContext& ctx)
+		: 
+		m_context(ctx),
 		m_vao(0),
 		m_rayTracingSupported(false)
 	{
@@ -93,7 +82,7 @@ namespace pgrender {
 
 	// ===== INICIALIZACIÓN ESPECÍFICA DE PLATAFORMA =====
 
-	void ContextGL::initializeGLContext(const Context::Desc& desc) {
+	void ContextGL::initializeGLContext(const GLContextDescriptor& desc) {
 #ifdef _WIN32
 		// ===== Windows - WGL =====
 		HWND hwnd = static_cast<HWND>(m_nativeWindowHandle);

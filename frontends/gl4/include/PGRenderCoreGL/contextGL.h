@@ -6,6 +6,7 @@
 #include <cstdint>
 
 namespace pgrender {
+	class IGraphicsContext;
 
     /**
      * @brief Implementación OpenGL del contexto de renderizado.
@@ -13,12 +14,7 @@ namespace pgrender {
      */
     class ContextGL : public Context {
     public:
-        /**
-         * @brief Constructor.
-         * @param desc Descriptor con handles nativos de ventana/display.
-         * @param sharedContext Contexto OpenGL para compartir recursos (opcional).
-         */
-        explicit ContextGL(const Context::Desc& desc);
+        explicit ContextGL(IGraphicsContext& desc);
         ~ContextGL() override;
 
         BackendType getBackendType() const override { return BackendType::OpenGL; }
@@ -102,16 +98,10 @@ namespace pgrender {
         void setScissor(int x, int y, uint32_t width, uint32_t height) override;
         void setPolygonMode(PolygonMode mode) override;
 
-        /**
-         * @brief Obtiene el contexto OpenGL nativo.
-         * El tipo exacto depende de la plataforma (HGLRC, GLXContext, etc.).
-         */
-        void* getNativeContext() const { return m_glContext; }
-
     private:
         void* m_nativeWindowHandle;     // Platform-specific window handle
         void* m_nativeDisplayHandle;    // Platform-specific display handle (X11, Wayland)
-        void* m_glContext;              // OpenGL context (HGLRC, GLXContext, EGLContext, etc.)
+        IGraphicsContext& m_context;              // OpenGL context (HGLRC, GLXContext, EGLContext, etc.)
         uint32_t m_vao;
 
         // Estado de binding
@@ -131,7 +121,7 @@ namespace pgrender {
         int m_clearStencil = 0;
 
         // Platform-specific initialization
-        void initializeGLContext(const Context::Desc& desc);
+        void initializeGLContext(const GLContextDescriptor& desc);
         void cleanupGLContext();
     };
 

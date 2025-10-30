@@ -12,8 +12,15 @@ namespace pgrender::backends::sdl3 {
 		SDL_WindowID windowId = 0;
 		IWindow::Desc config;
 		bool shouldClose = false;
+		pgrender::IGraphicsContext* graphicsContext = nullptr;
 
-		explicit Impl(const IWindow::Desc& cfg) : config(cfg) {}
+		explicit Impl(const IWindow::Desc& cfg, const IGraphicsDescriptor* ctxConfig) : config(cfg) {
+			switch (ctxConfig->getBackend()) {
+			case RenderBackend::Auto:
+
+			}
+			doCreateWindow();
+		}
 
 		void doCreateWindow() {
 			SDL_WindowFlags flags = 0;
@@ -61,9 +68,8 @@ namespace pgrender::backends::sdl3 {
 	};
 
 	// Implementación de SDL3Window usando PIMPL
-	SDL3Window::SDL3Window(const IWindow::Desc& config)
+	SDL3Window::SDL3Window(const IWindow::Desc& config, const IGraphicsDescriptor* ctxConfig)
 		: m_impl(std::make_unique<Impl>(config)) {
-		m_impl->doCreateWindow();
 	}
 
 	SDL3Window::~SDL3Window() = default;
@@ -101,7 +107,6 @@ namespace pgrender::backends::sdl3 {
 	std::unique_ptr<IGraphicsContext> SDL3Window::createContext(const IContextDescriptor& config) {
 		return std::make_unique<SDL3GraphicsContext>(m_impl->window, config);
 	}
-
 
 
 	// SDL3: Modo relativo de mouse (por ventana)

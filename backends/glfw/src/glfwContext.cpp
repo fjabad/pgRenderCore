@@ -20,7 +20,7 @@ namespace pgrender::backends::glfw {
 				? GLFW_OPENGL_CORE_PROFILE
 				: GLFW_OPENGL_COMPAT_PROFILE);
 
-			if (config.debugContext) {
+			if (config.enableDebug) {
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 			}
 

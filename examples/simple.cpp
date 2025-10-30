@@ -18,8 +18,9 @@ int main() {
 		auto window1 = windowMgr.createWindow(config);
 		//auto window2 = windowMgr.createWindow(config);
 
-		pgrender::GLContextDescriptor ctxConfig;
-
+		pgrender::GLContextDescriptor glCtx;
+		
+		windowMgr.setWindowContext(window1, glCtx);
 
 		// Loop principal
 		while (windowMgr.hasOpenWindows()) {
